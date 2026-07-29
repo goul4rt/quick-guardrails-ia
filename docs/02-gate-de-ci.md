@@ -38,6 +38,8 @@ O workflow sozinho **não trava merge nenhum**. É preciso (manual, admin):
 
 Sem isso, o gate é opcional na prática. O PR #123 listou isso como critério de aceitação explícito — é parte da entrega, não um detalhe.
 
+> ⚠️ **Custo da enforcement**: branch protection em repo **privado** é recurso **pago** (GitHub Pro para conta pessoal, Team para organização). Em repo público, qualquer plano tem. Num privado sem plano pago, o gate roda mas não trava merge — decida conscientemente o que fazer com isso ([doc 09](09-custos.md)).
+
 ## A armadilha do `paths-ignore` + required check
 
 Otimização natural: PR só de docs não precisa rodar o gate pesado. Mas há uma pegadinha do GitHub Actions ([PR #131](https://github.com/Instivo/instivo-pesquisador-app/pull/131)):

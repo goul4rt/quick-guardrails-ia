@@ -2,37 +2,39 @@
 
 Os docs anteriores cobrem o gate de qualidade (lint, tipos, testes) e a supply chain (vulnerabilidade de dependência). Falta a camada de **segurança do código em si**: secrets commitados, injeção, permissão insegura. É aqui que entra a ideia de "AI-powered DevSecOps guardrail" — que funciona, mas só com os papéis certos.
 
-Template pronto: [`security.yml`](../templates/.github/workflows/security.yml)
+Template pronto (100% free): [`security.yml`](../templates/.github/workflows/security.yml)
 
-> **Origem**: artigo *Building an AI-Powered DevSecOps Guardrail Pipeline with GitHub Actions* (E. Opurum, HackerNoon, 2026) e o repo de referência dele. A arquitetura proposta — job de scan de IA antes do build (`needs:`), alerta imediato no Slack — está certa. A implementação de referência comete erros instrutivos, analisados abaixo; extraímos o desenho e corrigimos a execução.
+> **Origem**: artigo *Building an AI-Powered DevSecOps Guardrail Pipeline with GitHub Actions* (E. Opurum, HackerNoon, 2026) e o repo de referência dele. A arquitetura proposta — job de scan antes do build (`needs:`), alerta imediato — está certa. A implementação de referência comete erros instrutivos, analisados abaixo; extraímos o desenho e corrigimos a execução.
 
 ## As três camadas, por confiabilidade
 
-| Camada | Ferramenta | Determinística? | Papel |
+| Camada | Ferramenta | Custo | Papel |
 |---|---|---|---|
-| 1. Secrets | `gitleaks` | Sim | **Bloqueante** — secret no diff trava o PR, sempre |
-| 2. Review semântico | `claude-code-security-review` | Não | **Recomendação** — comenta achados no PR; humano decide |
-| 3. Triagem de falha | LLM lendo o log do build | Não | **Pós-falha** — explica a quebra no alerta; zero poder de gate |
+| 1. Secrets | `gitleaks` CLI (MIT) | **Free** — está no template | **Bloqueante** — secret no diff trava o PR, sempre |
+| 2. Review semântico de segurança | Agente de IA sobre o diff do PR | Por token — **fora deste repo** (ver [doc 09](09-custos.md)) | Recomendação; nunca veredito |
+| 3. Triagem de falha | LLM lendo o log do build quebrado | Free tier viável (GitHub Models) | **Pós-falha** — explica a quebra no alerta; zero poder de gate |
 
 A regra que ordena tudo (é o princípio 2 do [README](../README.md) aplicado a segurança): **o que bloqueia precisa ser determinístico; o que é probabilístico recomenda.** Um check bloqueante que ora passa ora falha no mesmo código destrói a confiança no gate — e a resposta cultural é bypass, não correção.
 
-### Camada 1 — secrets: o caso perfeito para bloqueio
+### Camada 1 — secrets: o caso perfeito para bloqueio (e é free)
 
-Detecção de secret é pattern-matching com baixíssimo falso positivo: regex + entropia, resultado reproduzível. `gitleaks` no PR com `fetch-depth: 0` (varre os commits do PR, não só o estado final — secret commitado e "removido" no commit seguinte continua no histórico). Complementa o [doc 03](03-supply-chain.md): o `audit.yml` cuida de vulnerabilidade *de dependência*; o gitleaks, de segredo *seu*.
+Detecção de secret é pattern-matching com baixíssimo falso positivo: regex + entropia, resultado reproduzível. O template usa o **CLI do gitleaks direto** (MIT, sem cadastro) com `fetch-depth: 0` — varre os commits do PR, não só o estado final: secret commitado e "removido" no commit seguinte continua no histórico.
 
-### Camada 2 — review de IA: no diff, com filtro, sem martelo
+> Por que não o `gitleaks-action`? A partir da v2 ele deixou de ser MIT e **exige license key em repositórios de organização** (gratuita hoje, mediante cadastro — mas é uma dependência externa de licenciamento que o CLI não tem). Regra do repo: se existe caminho 100% livre equivalente, é ele que vai no template.
 
-O valor real de IA em segurança é o que regex não pega: lógica de autorização furada, injeção via caminho indireto, PII em log. O action oficial `anthropics/claude-code-security-review` acerta o desenho:
+Complementa o [doc 03](03-supply-chain.md): o `audit.yml` cuida de vulnerabilidade *de dependência*; o gitleaks, de segredo *seu*.
 
-- **Analisa o diff do PR**, não o repositório inteiro — escopo pequeno, contexto relevante.
-- **Filtro de falsos positivos embutido** (e customizável) antes de comentar.
-- **Comenta no PR** — o achado chega como recomendação revisável, não como veredito binário.
+### Camada 2 — review de IA: o desenho certo, se um dia houver orçamento
 
-Default recomendado: **não-bloqueante**. Se o time quiser endurecer depois, o action expõe `findings-count` como output — dá para falhar o job acima de um limiar, com o histórico de precisão já observado no próprio repo como justificativa.
+O valor real de IA em segurança é o que regex não pega: lógica de autorização furada, injeção via caminho indireto, PII em log. O desenho certo (implementado, por exemplo, pelo action oficial `anthropics/claude-code-security-review`): analisa **o diff do PR** (não o repo), filtra falsos positivos antes de reportar, e **comenta** — recomendação revisável, não veredito binário.
+
+**Esta camada não tem template aqui**: custa API por token a cada PR, e a regra deste repositório é não depender de serviço externo pago (ver [doc 09](09-custos.md)). O substituto free e local: rodar `/security-review` no Claude Code (que você já assina) antes de abrir o PR — mesma análise semântica, custo já coberto pela assinatura, e o resultado vai como comentário seu no PR.
 
 ### Camada 3 — IA explicando a falha do build
 
-A ideia mais reaproveitável do artigo de origem, e a de menor risco: quando o build falha, um LLM lê o log e posta no Slack **causa raiz + fix sugerido + prevenção** junto do link do run. Roda *depois* da falha (`if: failure()`), então não tem poder de gate nenhum — se a análise for ruim, o custo é um parágrafo ruim no Slack, não um merge travado. Ótimo primeiro passo para times céticos de IA no pipeline.
+A ideia mais reaproveitável do artigo de origem, e a de menor risco: quando o build falha, um LLM lê o log e posta no alerta **causa raiz + fix sugerido + prevenção** junto do link do run. Roda *depois* da falha (`if: failure()`), então não tem poder de gate — se a análise for ruim, o custo é um parágrafo ruim no canal, não um merge travado.
+
+Aqui o free tier do **GitHub Models** (via `GITHUB_TOKEN`, com rate limit) é aceitável: é exatamente o caso de uso que rate limit não quebra — roda só em falha, e se a cota estourar, o alerta sai sem a análise. Free tier **nunca** em check bloqueante ([doc 09](09-custos.md), regra 5).
 
 ## Anti-padrões (da implementação de referência — erros instrutivos)
 
@@ -51,6 +53,6 @@ Nenhum desses erros é exótico — são o caminho natural de quem conecta um LL
 
 ## Ligação com o resto do método
 
-- O `security.yml` segue as regras do [doc 02](02-gate-de-ci.md): `permissions: contents: read` (+ `pull-requests: write` só no job que comenta), `timeout-minutes`, jobs baratos primeiro.
-- Secret **de produção** nunca toca o gate — o review de IA usa uma API key própria (`secrets.ANTHROPIC_API_KEY`) com escopo único.
+- O `security.yml` segue as regras do [doc 02](02-gate-de-ci.md): `permissions: contents: read`, `timeout-minutes`, versão do scanner **pinada** (bump é PR explícito — mesma regra do [doc 03](03-supply-chain.md)).
 - Falso positivo do gitleaks se trata como qualquer guardrail simples ([doc 04](04-guardrails-do-agente.md)): documenta e usa `.gitleaksignore` pontual com justificativa no commit — não desliga o scanner.
+- Custo e enforcement de cada camada: [doc 09](09-custos.md).

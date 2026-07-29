@@ -2,6 +2,8 @@
 
 Práticas, guardrails e artefatos prontos para desenvolver software com agentes de IA (Claude Code) de forma **segura, reprodutível e auditável** — extraídos de trabalho real em produção.
 
+**Guideline formal de 0 → funcionando sem orçamento**: regras locais (hooks, configs versionadas), ferramentas OSS e recursos públicos/gratuitos. A única base paga assumida é a assinatura do Claude Code que você já tem. Peça que exige serviço externo pago ou cobrança por token **não entra nos templates** — a regra de admissão e a tabela de custos estão no [doc 09](docs/09-custos.md).
+
 Tudo aqui nasceu de uma sequência de PRs no `Instivo/instivo-pesquisador-app` (app React Native em produção), onde um agente de IA passou a trabalhar com gate de CI bloqueante, supply chain travada, guardrails de git e fluxo de task com evidência obrigatória:
 
 | PR | Tema | Estado |
@@ -34,7 +36,8 @@ Tudo aqui nasceu de uma sequência de PRs no `Instivo/instivo-pesquisador-app` (
 | [05 — Skills versionadas](docs/05-skills-versionadas.md) | `skills-lock.json`: skills de IA fixadas por hash, restauradas no `npm install` |
 | [06 — Fluxo de task](docs/06-fluxo-de-task.md) | `/task` e `/task close`: da issue do Jira ao merge com evidência e review duplo |
 | [07 — Lições aprendidas](docs/07-licoes-aprendidas.md) | Estudo de caso: o que os 5 PRs ensinaram (incluindo o que não foi adotado) |
-| [08 — Segurança no gate](docs/08-seguranca-no-gate.md) | Scanner determinístico bloqueia, IA recomenda: gitleaks + review de IA no diff + triagem de falha |
+| [08 — Segurança no gate](docs/08-seguranca-no-gate.md) | Scanner determinístico bloqueia, IA recomenda: gitleaks free + review local + triagem de falha |
+| [09 — Custos e regra de admissão](docs/09-custos.md) | Free por padrão: o que é free, o que é "free com pegadinha", o que ficou de fora e por quê |
 
 ### Artefatos prontos (`templates/`)
 
@@ -44,7 +47,7 @@ templates/
 │   ├── workflows/ci.yml            # gate de PR bloqueante (adapte os checks à sua stack)
 │   ├── workflows/ci-docs-noop.yml  # companheiro do paths-ignore (required check nunca trava)
 │   ├── workflows/audit.yml         # npm audit mensal → abre/atualiza issue
-│   ├── workflows/security.yml      # gitleaks (bloqueante) + review de segurança por IA (recomendação)
+│   ├── workflows/security.yml      # gitleaks CLI (free, bloqueante) — secrets no histórico
 │   └── dependabot.yml              # semanal, majors excluídos, minor+patch agrupados
 ├── .claude/
 │   ├── settings.json               # hooks + plugins versionados (guardrails de time)
