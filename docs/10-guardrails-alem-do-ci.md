@@ -2,7 +2,7 @@
 
 Guardrail não é só check de pipeline. **Guardrail é qualquer mecanismo que impede um modo de falha conhecido de acontecer de novo, sem depender de alguém lembrar.** Boa parte dos guardrails mais eficazes de um projeto não vive no CI — vive em hooks, workflows de manutenção, skills de roteamento e até na memória do agente. Muitos times já os têm sem saber que são guardrails; este doc dá o vocabulário para inventariá-los e escolher o nível certo para cada falha.
 
-Template pronto: [`close-sub-issues.yml`](../templates/.github/workflows/close-sub-issues.yml)
+Templates prontos: [`close-sub-issues.yml`](../templates/.github/workflows/close-sub-issues.yml) · [`routing-work/`](../templates/.claude/skills/routing-work/SKILL.md) (skill copiável + guia de adaptação)
 
 > **Origem**: inventário do ecossistema `delfus` (`goul4rt/discord-bot` + `delfus-v2`), onde estes mecanismos existiam em produção antes de serem reconhecidos como guardrails. Todos free (regra do [doc 09](09-custos.md)).
 
@@ -52,6 +52,8 @@ Mecânica que vale copiar para qualquer projeto:
 - **Regras cross-repo como contrato**: spec-pai sempre no repo dono do contrato (schema + API); ordem fixa schema → endpoint → consumo; "1 sessão = 1 ticket = 1 repo".
 
 Governança da skill: vive **nos dois repos**, e só muda com os dois sincronizados — a skill de processo é código compartilhado, com a mesma disciplina.
+
+> **Versão copiável**: [`templates/.claude/skills/routing-work/`](../templates/.claude/skills/routing-work/SKILL.md) — a skill genérica com placeholders `⟨...⟩` + [`ADAPTING.md`](../templates/.claude/skills/routing-work/ADAPTING.md) explicando o que trocar, as regras que não se relativizam (dono do contrato, desempate T2/T3) e as decisões de forma (por que model-invoked, por que tabelas flat).
 
 ## Complementos menores do inventário
 

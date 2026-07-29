@@ -53,9 +53,10 @@ templates/
 │   └── dependabot.yml              # semanal, majors excluídos, minor+patch agrupados
 ├── .claude/
 │   ├── settings.json               # hooks + plugins versionados (guardrails de time)
-│   └── hooks/
-│       ├── block-dangerous-git.sh  # PreToolUse: bloqueia git destrutivo
-│       └── eslint-fix-edited.sh    # PostToolUse: auto-fix só no arquivo editado
+│   ├── hooks/
+│   │   ├── block-dangerous-git.sh  # PreToolUse: bloqueia git destrutivo
+│   │   └── eslint-fix-edited.sh    # PostToolUse: auto-fix só no arquivo editado
+│   └── skills/routing-work/        # skill de roteamento por tiers (copiável; ver ADAPTING.md)
 ├── scripts/
 │   ├── skills-install.mjs          # restaura skills do lock (postinstall seguro)
 │   └── jira-attach.sh              # anexa evidência a issue do Jira via REST
