@@ -72,6 +72,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
   - *Verificar*: critérios de tier observáveis; desempate T2/T3 presente; "verde" honesto por repo
 - [ ] `(se aplica, 2+ repos)` **Dono do contrato** definido; spec-pai sempre nele; ordem contrato → provedor → consumidor
 - [ ] `(se aplica)` Fluxo de task com **evidência por critério de aceite** e veredito honesto (PASSOU/FALHOU) — [doc 06](docs/06-fluxo-de-task.md)
+- [ ] `(se aplica, tracker externo)` MCP do tracker **versionado no repo** (`.mcp.json`), servidor em Docker, credenciais lidas do `.env` no launch — [template](templates/.mcp.json)
+  - *Verificar*: nenhum segredo no `.mcp.json` commitado; clone limpo + `.env` preenchido = tracker plugado
 - [ ] `(se aplica, tracker com sub-issues)` Cascata de fechamento automatizada — [template](templates/.github/workflows/close-sub-issues.yml)
 
 ## 7. Meta — [docs 07](docs/07-licoes-aprendidas.md), [09](docs/09-custos.md)

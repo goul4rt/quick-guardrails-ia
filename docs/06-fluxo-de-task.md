@@ -2,7 +2,15 @@
 
 O comando de projeto `/task` empacota o ciclo de vida de uma tarefa em duas metades: **`/task <id>`** (pré-step: contexto antes de código) e **`/task close <id>`** (encerramento: prova antes de merge). O desenho vale para qualquer tracker — aqui o Jira via MCP.
 
-Template auxiliar: [`jira-attach.sh`](../templates/scripts/jira-attach.sh) (upload de evidência via REST).
+Templates auxiliares: [`.mcp.json`](../templates/.mcp.json) (o tracker plugado no agente) · [`jira-attach.sh`](../templates/scripts/jira-attach.sh) (upload de evidência via REST).
+
+## A infraestrutura: MCP do tracker versionado no repo
+
+O fluxo inteiro depende do agente falar com o Jira (`mcp__jira__*`). Isso não é setup individual de cada dev — é **config de time, versionada**: um `.mcp.json` na raiz do repo ([template](../templates/.mcp.json)), no mesmo espírito do `settings.json` versionado ([doc 04](04-guardrails-do-agente.md)). Quem clona já tem o tracker plugado. O desenho tem três decisões que valem copiar:
+
+1. **O servidor MCP roda em Docker** (`docker run -i --rm` da imagem OSS `mcp-atlassian`): zero instalação local, versão isolada do host, morre com a sessão (`--rm`, nome único por PID, `exec` para propagar sinais). Free — imagem OSS + Docker ([doc 09](09-custos.md)).
+2. **Segredo nunca toca o arquivo versionado**: o bootstrap lê `JIRA_USERNAME`/`TOKEN_FOR_JIRA` do `.env` (gitignorado) no momento do launch e injeta como env no container. O `.env.example` documenta as variáveis e onde gerar o token.
+3. **Uma fonte de verdade para credenciais**: o mesmo par do `.env` serve o MCP (ler issue, comentar) e o `jira-attach.sh` (upload REST de anexos — caminho que o MCP não cobre). Rotacionou o token, os dois seguem funcionando.
 
 ## `/task <id>` — pré-step: proibido codar
 

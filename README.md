@@ -52,6 +52,7 @@ templates/
 │   └── skills/routing-work/        # skill de roteamento por tiers (copiável; ver ADAPTING.md)
 ├── .husky/
 │   └── pre-commit                  # disciplina de branch no git — vale p/ humano e agente
+├── .mcp.json                       # tracker plugado no agente: MCP do Jira em Docker, creds via .env
 ├── scripts/
 │   ├── skills-install.mjs          # restaura skills do lock (postinstall seguro)
 │   └── jira-attach.sh              # anexa evidência a issue do Jira via REST

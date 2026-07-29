@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "jira": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "export JIRA_API_TOKEN=\"$(grep -E '^TOKEN_FOR_JIRA=' \"$CLAUDE_PROJECT_DIR/.env\" | cut -d= -f2-)\"; export JIRA_USERNAME=\"$(grep -E '^JIRA_USERNAME=' \"$CLAUDE_PROJECT_DIR/.env\" | cut -d= -f2-)\"; export JIRA_URL=\"https://SUA-INSTANCIA.atlassian.net\"; exec docker run -i --rm --name \"mcp-atlassian-$$\" -e JIRA_URL -e JIRA_USERNAME -e JIRA_API_TOKEN ghcr.io/sooperset/mcp-atlassian:latest"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}
