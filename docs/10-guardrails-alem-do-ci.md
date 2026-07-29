@@ -55,6 +55,27 @@ Governança da skill: vive **nos dois repos**, e só muda com os dois sincroniza
 
 > **Versão copiável**: [`templates/.claude/skills/routing-work/`](../templates/.claude/skills/routing-work/SKILL.md) — a skill genérica com placeholders `⟨...⟩` + [`ADAPTING.md`](../templates/.claude/skills/routing-work/ADAPTING.md) explicando o que trocar, as regras que não se relativizam (dono do contrato, desempate T2/T3) e as decisões de forma (por que model-invoked, por que tabelas flat).
 
+## A segunda dimensão: o que acontece quando dispara
+
+O espectro acima diz **onde** o guardrail vive; falta decidir **qual é a resposta** ao disparo. Os frameworks de guardrail de runtime de LLM (ver [doc 12](12-fronteira-runtime.md)) têm essa taxonomia fechada e nomeada há anos — as ações "on fail" — e ela mapeia 1:1 para guardrails de desenvolvimento:
+
+| Resposta | No runtime | Em guardrail de dev |
+|---|---|---|
+| **Bloquear** | exception | hook `exit 2`; check vermelho no gate |
+| **Corrigir determinístico** | fix | `lint --fix`, formatter, codemod (o hook de `PostToolUse` do [doc 04](04-guardrails-do-agente.md)) |
+| **Corrigir, revalidar, só então escalar** | fix + reask | o fixer roda primeiro; o agente só é acionado se o gate *ainda* reprovar |
+| **Devolver a falha a quem gerou** | reask | o stderr do hook volta ao modelo como novo turno — funciona na proporção da qualidade da mensagem ([doc 04](04-guardrails-do-agente.md)) |
+| **Só registrar** | noop | modo warn-only para estrear regra nova sem quebrar ninguém — com prazo para virar bloqueante, ou vira decoração ([doc 02](02-gate-de-ci.md)) |
+
+Duas regras derivadas:
+
+- **Fixer determinístico antes de turno de agente.** Nunca gaste uma rodada do modelo consertando o que `prettier --write` conserta — é o free-first aplicado ao orçamento da assinatura: o determinístico é grátis e instantâneo; o agente é o recurso caro da cadeia.
+- **Auto-fix sem fallback é fail-open disfarçado.** Se o `--fix` não conseguiu corrigir, o gate **reprova** — nunca deixa passar o valor original em silêncio. Um auto-fix sem caminho de falha definido é um guardrail que às vezes não guarda nada.
+
+## Quem pode mudar o guardrail
+
+Regra de governança que os níveis 1–5 pressupõem e ninguém escreve: **o agente não edita o próprio guardrail no mesmo fluxo em que trabalha**. A checagem roda fora do loop de controle do agente (hook, CI), e mudança de política — nova regra, exceção, calibragem — passa por aprovação humana explícita, como qualquer código: PR revisado, ou fluxo rascunho → confirmação → vigência. Sem isso, o caminho de menor resistência diante de um bloqueio é "ajustar" a regra que bloqueou — e o guardrail vira sugestão. (O mesmo motivo pelo qual exceção de gitleaks é `.gitleaksignore` com justificativa em PR, nunca desligar o job — [doc 08](08-seguranca-no-gate.md).)
+
 ## Complementos menores do inventário
 
 - **Nível 1 — hooks de git (husky)**: enquanto os hooks do Claude Code valem só para o agente, `pre-commit`/`pre-push` valem para **humano e agente**: validam o padrão do nome da branch e bloqueiam commit direto nas branches de integração — [template](../templates/.husky/pre-commit). O detalhe que separa hook bom de hook chato: **skips explícitos** para detached HEAD e rebase/cherry-pick/merge em andamento — sem eles o hook quebra operações legítimas do git e vira incentivo cultural ao `--no-verify`.

@@ -29,6 +29,15 @@ Decisões que valem copiar (todas comentadas no template):
 | Resumo no `$GITHUB_STEP_SUMMARY` | Quem abre o run entende o contrato do gate sem ler o YAML |
 | Gate separado do pipeline de release | O `build.yml` (release) segue intocado; gate de PR não builda APK |
 
+## CI verde que não prova nada
+
+Antes de bloquear merge, o check precisa **falhar quando o trabalho falha** — e há dois jeitos clássicos de perder isso sem perceber (ambos flagrados num pipeline público de "AI guardrail" examinado em jul/2026, com 31 de 38 runs `success` e `BUILD FAILED` no log):
+
+- **Exit code engolido por pipe.** `./build 2>&1 | tee build.log` reporta o status do `tee`, sempre 0. Regra: `set -o pipefail` no topo de todo step multi-comando — ou `${PIPESTATUS[0]}` **lido e usado**. No caso examinado, o exit code era capturado em `$GITHUB_OUTPUT` e nunca lido em lugar nenhum: pior que não capturar, porque parece rigor.
+- **Veredito de gate cacheado.** `actions/cache` guardando o *resultado* de um scan por hash de árvore faz o step virar `skipped` — o badge verde vira o `cat` de um arquivo antigo. Cache é para dependência e artefato; veredito de checagem se recomputa sempre. Se o custo dói, reduza o escopo (diff-only), não memoize o resultado.
+
+O antídoto sistemático para gate quebrado-mas-verde é o canário por gate — [doc 11](11-teste-o-guardrail.md).
+
 ## Branch protection: o passo que ninguém automatiza
 
 O workflow sozinho **não trava merge nenhum**. É preciso (manual, admin):

@@ -14,6 +14,7 @@ Tudo aqui nasceu de trabalho real em **três codebases em produção** — um ap
 4. **Evidência, não afirmação.** Task só fecha com prova visual (screenshot + log) por critério de aceite. Falhou? Reporta como falhou — nunca maquia.
 5. **Não presuma, não invente.** Sem critérios de aceite → pergunta. Sem PR aberto → pede. MCP desconectado → avisa e para. O agente expõe trade-offs em vez de decidir em silêncio.
 6. **Exceções são documentadas, não escondidas.** Fugiu da convenção de propósito? A decisão e o porquê ficam registrados no PR.
+7. **Guardrail também é código — sem teste, quebra em silêncio e continua verde.** Cada gate tem um canário (caso mau que deve reprovar, caso bom que deve passar) rodando no CI.
 
 ## Mapa do repositório
 
@@ -31,6 +32,8 @@ Tudo aqui nasceu de trabalho real em **três codebases em produção** — um ap
 | [08 — Segurança no gate](docs/08-seguranca-no-gate.md) | Scanner determinístico bloqueia, IA recomenda: gitleaks free + review local + triagem de falha |
 | [09 — Custos e regra de admissão](docs/09-custos.md) | Free por padrão: o que é free, o que é "free com pegadinha", o que ficou de fora e por quê |
 | [10 — Guardrails além do CI](docs/10-guardrails-alem-do-ci.md) | O espectro de enforcement: hooks, automação de invariante, regras de STOP, roteamento por tiers, memória |
+| [11 — Teste o guardrail](docs/11-teste-o-guardrail.md) | Canário por gate: must-block/must-pass no CI — guardrail sem teste quebra em silêncio |
+| [12 — Fronteira runtime](docs/12-fronteira-runtime.md) | Guardrails de dev × de runtime de LLM: o que transferiu, e as opções OSS (com ressalvas) para quem constrói produto |
 
 ### Artefatos prontos (`templates/`)
 
@@ -55,7 +58,8 @@ templates/
 ├── .mcp.json                       # tracker plugado no agente: MCP do Jira em Docker, creds via .env
 ├── scripts/
 │   ├── skills-install.mjs          # restaura skills do lock (postinstall seguro)
-│   └── jira-attach.sh              # anexa evidência a issue do Jira via REST
+│   ├── jira-attach.sh              # anexa evidência a issue do Jira via REST
+│   └── test-guardrails.sh          # canário do hook: must-block/must-pass (doc 11)
 └── .npmrc                          # save-exact=true
 ```
 
@@ -74,7 +78,7 @@ Regras para o agente que vier por aqui: **verifique, não presuma** (cada item t
 ## Como adotar em um repositório novo
 
 1. **Contexto**: escreva um `CLAUDE.md` enxuto com regras objetivas ([doc 01](docs/01-contexto-do-projeto.md)).
-2. **Guardrails**: copie `templates/.claude/` e versione no repo ([doc 04](docs/04-guardrails-do-agente.md)).
+2. **Guardrails**: copie `templates/.claude/` e versione no repo ([doc 04](docs/04-guardrails-do-agente.md)) — junto do canário que prova que eles funcionam ([doc 11](docs/11-teste-o-guardrail.md)).
 3. **Gate**: adapte `templates/.github/workflows/ci.yml` à sua stack — e **zere a dívida antes de ligar o bloqueio** ([doc 02](docs/02-gate-de-ci.md)).
 4. **Supply chain**: `.npmrc` com `save-exact`, pins exatos, `dependabot.yml` e `audit.yml` ([doc 03](docs/03-supply-chain.md)).
 5. **Branch protection**: exija o check `ci` e bloqueie push direto na branch principal — sem isso o gate não trava nada (passo manual, precisa de admin).

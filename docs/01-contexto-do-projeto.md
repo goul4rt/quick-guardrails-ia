@@ -27,6 +27,14 @@ Regra vaga ("escreva código limpo") não muda comportamento. Regra objetiva sim
 
 Cada regra dessas é **checável num diff**: um reviewer (humano ou agente) consegue dizer objetivamente se foi violada.
 
+### 2b. Válvulas de escape nomeadas, com justificativa obrigatória
+
+Todo gate tem um escape hatch (`# noqa`, `eslint-disable`, `@ts-expect-error`, `--no-verify`, `testPathIgnorePatterns`) — e um agente pressionado a "fazer o check passar" vai encontrá-lo. O contrato não finge que a válvula não existe: **nomeia cada uma e exige comentário com o porquê** ao lado do uso — regra checável por lint. Complementos da mesma família:
+
+- **Cláusula anti-cosmética**: quando um gate reprovar, a instrução é repensar a causa ("repense a forma dos dados"), não reescrever até o gate calar. Satisfazer o gate sem satisfazer a intenção é gaming — e o agente faz isso por default se ninguém proibir.
+- **Gate aponta, doc de remediação orienta**: o check diz *o que* violou; um doc curto diz *como escolher* a correção (um fluxograma de decisão, não prosa). Sem ele, a "correção" degenera na cosmética acima.
+- Pisos são pisos: "cobertura ≥ 80%" acompanha "nunca *reduzir* cobertura" — senão o piso vira teto.
+
 ### 3. Gotchas com o porquê
 
 Gotcha sem contexto vira superstição; com contexto, vira conhecimento transferível:

@@ -17,6 +17,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
   - *Verificar*: para cada regra, um reviewer consegue dizer objetivamente se um diff a viola
 - [ ] Gotchas registrados **com o porquê** de cada um
 - [ ] Tabela de anti-patterns (Não faça | Porquê)
+- [ ] Válvulas de escape nomeadas com justificativa obrigatória (`# noqa`/`eslint-disable`/`@ts-expect-error` exigem comentário) + cláusula anti-cosmética por gate
+  - *Verificar*: lint reprova supressão sem comentário; o contrato manda repensar a causa, não reescrever até o gate calar
 - [ ] **Regra de STOP** para cada operação em que o "fix" sugerido pela ferramenta é catástrofe — [doc 10](docs/10-guardrails-alem-do-ci.md)
   - *Verificar*: sintoma exato + PARE + caminho certo + proibição do atalho
 
@@ -30,6 +32,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
   - *Verificar*: rápido (1 arquivo), nunca bloqueia (`exit 0`), silencioso, degrada bem
 - [ ] Hooks de **git** (husky) com disciplina de branch — valem para humano E agente — [template](templates/.husky/pre-commit)
   - *Verificar*: commit em branch de integração é bloqueado; rebase/merge em andamento passa sem erro
+- [ ] **Canário por gate**: casos must-block e must-pass versionados, rodando no CI — [template](templates/scripts/test-guardrails.sh) / [doc 11](docs/11-teste-o-guardrail.md)
+  - *Verificar*: sabotar o hook de propósito (remover uma regra) → canário fica vermelho; restaurar → verde
 
 ## 3. Gate de CI — [doc 02](docs/02-gate-de-ci.md)
 
@@ -38,6 +42,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
 - [ ] Dívida zerada **antes** de ligar o bloqueio (0 errors de lint/types; suites quebradas por design em ignore explícito)
   - *Verificar*: os comandos do gate saem com exit 0 na mainline
 - [ ] Checks em ordem barato → caro; `timeout-minutes`; `permissions: contents: read`; concurrency cancelando só em PR
+- [ ] Nenhum exit code engolido e nenhum veredito cacheado
+  - *Verificar*: todo step multi-comando com pipe tem `set -o pipefail` (ou lê `PIPESTATUS`); nenhum `actions/cache` cobre resultado de checagem
 - [ ] **Branch protection exigindo o check + bloqueio de push direto** (⚠️ pago em repo privado — [doc 09](docs/09-custos.md))
   - *Verificar*: merge com check vermelho é impossível; OU a ausência é decisão registrada ("gate informativo, disciplina social")
 - [ ] `(se aplica)` `paths-ignore` de docs acompanhado do workflow no-op espelhado — [template](templates/.github/workflows/ci-docs-noop.yml)

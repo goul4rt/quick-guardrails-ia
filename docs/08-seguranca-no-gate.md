@@ -49,7 +49,7 @@ A implementação do artigo usa o LLM como **check bloqueante** sobre o **repo i
 | Veredito parseado por prefixo de string (`startswith("FAIL")`) | Um "FAIL" que o modelo formatar diferente vira PASS. Parsing frágil de output não-estruturado em decisão de merge |
 | Resultado de scan cacheado por hash e reaproveitado | Um PASS obtido num scan truncado fica "aprovado" para sempre naquele estado de árvore |
 
-Nenhum desses erros é exótico — são o caminho natural de quem conecta um LLM no CI sem separar *bloquear* de *recomendar*. Por isso valem documentação.
+Nenhum desses erros é exótico — são o caminho natural de quem conecta um LLM no CI sem separar *bloquear* de *recomendar*. Por isso valem documentação. Um **segundo** pipeline público examinado em jul/2026 reproduziu quatro desses anti-padrões de forma independente (LLM bloqueante, repo inteiro truncado em 20 arquivos, `startswith("FAIL")`, veredito cacheado) — e adicionou o quinto ato: quando a única checagem determinística do pipeline gerou o primeiro vermelho legítimo, ela foi deletada para o badge voltar a ficar verde. A história completa, com os recibos de CI, está no [doc 11](11-teste-o-guardrail.md).
 
 ## Ligação com o resto do método
 

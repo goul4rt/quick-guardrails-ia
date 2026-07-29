@@ -45,6 +45,12 @@ Leituras corretas do incidente:
 2. **Fix mínimo**: `npm install --package-lock-only` — regenera só o lock, `package.json` intocado, nenhuma dep de app alterada.
 3. **Verificação objetiva antes do merge**: `npm ci --dry-run` voltando a passar.
 
+## A quinta peça (opcional): drift declarado × importado, e código morto
+
+Pins, Dependabot e audit atacam **versão e CVE** — nenhum deles vê duas derivas que agente de IA produz com frequência: pacote **importado sem estar declarado** (funciona por hoisting até parar de funcionar) ou **declarado sem uso** (superfície de ataque e de audit à toa), e **código órfão** — o agente gera módulos/exports que nada chama, e ninguém revisa o que ninguém importa. Ferramentas OSS cobrem os dois num check só (`knip` em TS; `deptry` + `vulture` em Python). Se adotar, a regra do [doc 02](02-gate-de-ci.md) vale: zere o backlog no PR que liga o check, e bloqueante ou nada.
+
+Anti-padrão observado num template público (jul/2026), para contraste: **lockfile no `.gitignore`** com ranges `>=` — cada install do CI resolve versões novas (um `>=1.19` instalou o major `2.3`), e o audit escaneia um alvo que muda sozinho. É a negação das quatro peças de uma vez.
+
 ## Limite de escopo: escalar o que não é seu
 
 Durante o trabalho de E1 apareceu um problema de arquitetura fora do escopo (secret de cloud embutido no binário pelo pipeline de release — extraível por decompilação). A resposta certa não foi "aproveitar e corrigir" nem ignorar: foi **registrar no PR como pendência conhecida e escalar à gestão**. Agente (e humano) disciplinado não expande escopo silenciosamente em área sensível.

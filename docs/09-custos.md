@@ -51,6 +51,10 @@ Registrar o que ficou de fora **e por quê** é o mesmo padrão do [doc 03](03-s
 - **Organização** → confira a **licença** de cada action, não só o preço (o caso gitleaks-action). CLI direto costuma ser o caminho sem fricção.
 - **Vontade de IA no pipeline** → comece pelo que roda só em falha (custo zero de gate, free tier tolerável). Review semântico fica **local, dentro da assinatura**.
 
+## Free por cortesia tem prazo
+
+Evidência de jul/2026, do maior framework OSS de guardrails de runtime ([doc 12](12-fronteira-runtime.md)): os endpoints de inferência hospedados, lançados como "free preview", foram anunciados para desligamento em **06/08/2026** — e o registry de pacotes próprio (token-gated) do mesmo projeto foi abandonado em favor do PyPI público. O padrão: **free por cortesia do vendor é uma promoção, não uma propriedade** — expira quando a estratégia muda. O que sobrevive é o artefato que você mesmo pode hospedar e rodar (o pacote OSS, o CLI, os pesos com licença livre). Na dúvida entre dois caminhos free, escolha o que continua existindo se o vendor sumir amanhã — é o mesmo critério que já decidiu gitleaks CLI sobre gitleaks-action.
+
 ## O que os artigos não contam
 
 O artigo de origem do [doc 08](08-seguranca-no-gate.md) afirma que "developers cannot bypass security checks because they are embedded directly into the CI/CD pipeline". **Isso é falso sem branch protection** — que ele não menciona, e que em repo privado é recurso pago. Workflow no repo ≠ enforcement: qualquer um mergeia com o check vermelho até existir uma regra exigindo o check verde. A lição generaliza: **todo tutorial de pipeline assume enforcement que ele nunca configura e custo que ele nunca declara.** Verifique os dois antes de adotar qualquer coisa — inclusive deste repositório.
