@@ -43,4 +43,6 @@ Regras que fazem o canário valer:
 - **Drift de docs**: o caso 2 documentava no README um diretório de policies **que nunca existiu em commit algum**. Um check de cinco linhas — extrair caminhos citados em README/`CLAUDE.md` e falhar se algum não existir — impede contrato de contexto apontando para infra fantasma ([doc 01](01-contexto-do-projeto.md)).
 - **O `--dry-run` do `/task`** ([doc 06](06-fluxo-de-task.md)): validar o fluxo sem efeito colateral é a mesma disciplina aplicada a processo.
 
+**Limite conhecido do canário**: ele testa a *lógica* do gate, mas não sobrevive à *deleção do step que o invoca* — no bot Node do estudo de caso, um refactor removeu a linha que rodava a suíte e o job ficou verde por meses ([doc 02](02-gate-de-ci.md), terceiro modo de falha). Para esse modo, a defesa é processo, não código: mudança em `.github/workflows/` é PR dedicado, nunca carona em refactor.
+
 **Fonte**: exploração grounded de dois repositórios públicos de guardrails (jul/2026), com execução real dos gates e leitura dos logs de CI — os dois casos acima.

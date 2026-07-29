@@ -44,6 +44,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
 - [ ] Checks em ordem barato → caro; `timeout-minutes`; `permissions: contents: read`; concurrency cancelando só em PR
 - [ ] Nenhum exit code engolido e nenhum veredito cacheado
   - *Verificar*: todo step multi-comando com pipe tem `set -o pipefail` (ou lê `PIPESTATUS`); nenhum `actions/cache` cobre resultado de checagem
+- [ ] Mudança em `.github/workflows/` só em PR dedicado (nunca de carona em refactor); steps que executam o gate têm comentário-sentinela
+  - *Verificar*: `git log --oneline -- .github/workflows/` mostra apenas commits cujo assunto é CI/workflow
 - [ ] **Branch protection exigindo o check + bloqueio de push direto** (⚠️ pago em repo privado — [doc 09](docs/09-custos.md))
   - *Verificar*: merge com check vermelho é impossível; OU a ausência é decisão registrada ("gate informativo, disciplina social")
 - [ ] `(se aplica)` `paths-ignore` de docs acompanhado do workflow no-op espelhado — [template](templates/.github/workflows/ci-docs-noop.yml)
