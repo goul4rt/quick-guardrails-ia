@@ -38,6 +38,7 @@ Tudo aqui nasceu de uma sequência de PRs no `Instivo/instivo-pesquisador-app` (
 | [07 — Lições aprendidas](docs/07-licoes-aprendidas.md) | Estudo de caso: o que os 5 PRs ensinaram (incluindo o que não foi adotado) |
 | [08 — Segurança no gate](docs/08-seguranca-no-gate.md) | Scanner determinístico bloqueia, IA recomenda: gitleaks free + review local + triagem de falha |
 | [09 — Custos e regra de admissão](docs/09-custos.md) | Free por padrão: o que é free, o que é "free com pegadinha", o que ficou de fora e por quê |
+| [10 — Guardrails além do CI](docs/10-guardrails-alem-do-ci.md) | O espectro de enforcement: hooks, automação de invariante, regras de STOP, roteamento por tiers, memória |
 
 ### Artefatos prontos (`templates/`)
 
@@ -48,6 +49,7 @@ templates/
 │   ├── workflows/ci-docs-noop.yml  # companheiro do paths-ignore (required check nunca trava)
 │   ├── workflows/audit.yml         # npm audit mensal → abre/atualiza issue
 │   ├── workflows/security.yml      # gitleaks CLI (free, bloqueante) — secrets no histórico
+│   ├── workflows/close-sub-issues.yml # cascata: pai fechada → fecha sub-issues (cross-repo)
 │   └── dependabot.yml              # semanal, majors excluídos, minor+patch agrupados
 ├── .claude/
 │   ├── settings.json               # hooks + plugins versionados (guardrails de time)

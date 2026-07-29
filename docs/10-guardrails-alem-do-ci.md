@@ -1,0 +1,68 @@
+# 10 — Guardrails além do CI: o espectro de enforcement
+
+Guardrail não é só check de pipeline. **Guardrail é qualquer mecanismo que impede um modo de falha conhecido de acontecer de novo, sem depender de alguém lembrar.** Boa parte dos guardrails mais eficazes de um projeto não vive no CI — vive em hooks, workflows de manutenção, skills de roteamento e até na memória do agente. Muitos times já os têm sem saber que são guardrails; este doc dá o vocabulário para inventariá-los e escolher o nível certo para cada falha.
+
+Template pronto: [`close-sub-issues.yml`](../templates/.github/workflows/close-sub-issues.yml)
+
+> **Origem**: inventário do ecossistema `delfus` (`goul4rt/discord-bot` + `delfus-v2`), onde estes mecanismos existiam em produção antes de serem reconhecidos como guardrails. Todos free (regra do [doc 09](09-custos.md)).
+
+## O espectro: do mais duro ao mais macio
+
+| Nível | Mecanismo | Quando falha, o que acontece | Exemplo real |
+|---|---|---|---|
+| 1. **Hook do harness** | `PreToolUse`/`PostToolUse` — determinístico, roda sempre | A ação **não executa** | `block-dangerous-git.sh` ([doc 04](04-guardrails-do-agente.md)); rewrite automático de comandos via proxy de CLI |
+| 2. **Gate de CI + branch protection** | Check bloqueante | O merge **não acontece** | `ci.yml` ([doc 02](02-gate-de-ci.md)), `security.yml` ([doc 08](08-seguranca-no-gate.md)) |
+| 3. **Automação de invariante** | Workflow que corrige estado inconsistente sozinho | O estado **se auto-corrige** | Cascata de fechamento de sub-issues (abaixo) |
+| 4. **Contrato de contexto** | Regra objetiva no `CLAUDE.md`, carregada toda sessão | O agente **sabe e obedece** (probabilístico, mas presente sempre) | Anti-patterns com porquê; regras de STOP ([doc 01](01-contexto-do-projeto.md) e abaixo) |
+| 5. **Skill de roteamento** | Processo invocado por gatilho, com critérios observáveis | O trabalho **entra no fluxo certo** | `routing-delfus-work` (abaixo) |
+| 6. **Memória do agente** | Regra aprendida de feedback, recuperada por relevância | O erro **tende** a não repetir | "nunca stash pop cego", "grounding antes de aceitar premissa de issue" |
+
+**Regra de escolha**: para cada modo de falha, use o nível mais duro que o custo permite. Perda de trabalho → nível 1 (hook). Regressão de código → nível 2 (gate). Estado de board inconsistente → nível 3 (automação). Convenção de arquitetura → nível 4 (contrato). Processo desproporcional → nível 5 (roteamento). Preferência pessoal de fluxo → nível 6 (memória). Descer um nível (ex.: confiar convenção crítica só à memória) é aceitar que a falha vai acontecer de vez em quando.
+
+## Nível 3 na prática: cascata de sub-issues
+
+O GitHub **não fecha sub-issues quando a issue-pai fecha** — cada pai concluído deixa órfãs abertas sujando board e métricas. Pedir "lembre de fechar as filhas" é guardrail de nível 6 (vai falhar). A versão nível 3 é um workflow de 60 linhas ([template](../templates/.github/workflows/close-sub-issues.yml)) que merece cópia pelos detalhes:
+
+- **Dispara no evento certo** (`issues: closed`) e **pula o caso semanticamente errado**: pai fechado como `not_planned` não conclui as filhas.
+- **Cross-repo com degradação graciosa**: `SUB_ISSUE_TOKEN || GITHUB_TOKEN` — com o PAT fecha sub-issues em outros repos; sem ele, fecha as do próprio repo e **avisa** no log o que não conseguiu (limite visível, não silencioso — [doc 07](07-licoes-aprendidas.md), lição 7).
+- **Trilha de auditoria**: comenta em cada filha *por que* está sendo fechada (link para a pai) antes de fechar.
+- **Falha isolada**: erro numa filha não aborta a cascata das outras.
+
+## Nível 4 na prática: a regra de STOP
+
+Além dos anti-patterns com porquê ([doc 01](01-contexto-do-projeto.md)), o `CLAUDE.md` do delfus tem um padrão que merece nome: a **regra de STOP** — para operações onde o caminho "resolver o erro" é catastrófico:
+
+> Se o `db push` pedir `--accept-data-loss`, **PARE** — rode `db pull`, re-adicione seu model e pushe de novo. **NUNCA** passe `--accept-data-loss` para silenciar.
+
+A anatomia: (1) o sintoma exato que o agente vai ver, (2) a ordem de parar, (3) o caminho correto, (4) a proibição explícita do atalho. Sem isso, um agente diante do prompt "adicione `--accept-data-loss`?" tende a obedecer o erro — que aqui dropa tabelas do outro repo. Escreva uma regra de STOP para cada operação do projeto em que o "fix" sugerido pela ferramenta é a catástrofe.
+
+## Nível 5 na prática: cerimônia proporcional por tiers
+
+A skill `routing-delfus-work` resolve dois modos de falha opostos: trabalho grande sem processo (caos) e trabalho trivial afogado em processo (teatro). O princípio de abertura:
+
+> Cerimônia escala com o tamanho do trabalho, não com a vontade de rigor.
+
+Mecânica que vale copiar para qualquer projeto:
+
+- **Tiers com critério observável**, não subjetivo: T0 = "1 arquivo, sem lógica nova"; T3 = "sobrevive à sessão OU toca dois repos OU deve aparecer no board". Desempate operacional: *"se amanhã outra sessão precisar continuar, é T3"*.
+- **Fluxo fixo por tier** — de "zero specs/issues/planos" (T0) a spec + tickets + implementação por sessão (T3). A decisão de quanto processo aplicar é tomada **uma vez, na skill**, não renegociada a cada task.
+- **Decisões fixas anti-duplicação**: um único reviewer por diff (não somar reviewers), verificação antes de qualquer "pronto", e proibições explícitas do que *não* usar (worktrees com múltiplas instâncias, subagentes onde a partição por tickets já dá o paralelismo).
+- **"Verde" definido por repo, contra baseline**: a suíte do bot carrega ~20 falhas pré-existentes — o critério é comparar com master, não exigir zero ([doc 07](07-licoes-aprendidas.md), lição 3).
+- **Tabela de erros comuns** com a correção ao lado — os modos de falha do próprio processo, documentados.
+- **Regras cross-repo como contrato**: spec-pai sempre no repo dono do contrato (schema + API); ordem fixa schema → endpoint → consumo; "1 sessão = 1 ticket = 1 repo".
+
+Governança da skill: vive **nos dois repos**, e só muda com os dois sincronizados — a skill de processo é código compartilhado, com a mesma disciplina.
+
+## Complementos menores do inventário
+
+- **Nível 1 — proxy de CLI por hook**: um `PreToolUse` global reescreve comandos de dev para versões com saída otimizada em tokens (`git status` → `rtk git status`, transparente). Guardrail de **custo**: o agente não precisa lembrar de economizar contexto; o harness economiza por ele.
+- **Adaptador de vocabulário**: um `triage-labels.md` mapeando os papéis canônicos que as skills falam (`needs-triage`, `ready-for-agent`, ...) para as labels reais do tracker. Skills genéricas + tabela local = skills portáveis sem fork.
+- **Nível 6, honestamente**: regras de memória ("nunca `stash pop` cego", "push via credential helper do gh", "issue de backlog pode alegar infra que não existe — grounding antes de aceitar premissa") funcionam, mas por sessão e por relevância. Quando uma regra de memória falha pela segunda vez, é sinal de que ela quer subir de nível — virar hook, contrato ou automação.
+
+## Como inventariar os seus
+
+Três perguntas sobre qualquer coisa que seu time já automatizou ou padronizou:
+
+1. **Que falha isso impede?** Se há resposta, é guardrail — dê esse nome e documente a falha junto.
+2. **Em que nível está?** E a falha que ele previne justificaria um nível mais duro?
+3. **O que hoje só está na sua cabeça (ou na memória do agente)?** Cada regra repetida duas vezes em review é candidata a subir de nível.

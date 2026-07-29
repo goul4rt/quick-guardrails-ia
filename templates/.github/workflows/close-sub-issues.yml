@@ -1,0 +1,61 @@
+name: Close sub-issues when parent closes
+
+# GitHub does not natively close an issue's sub-issues when the parent is closed.
+# This cascades the close (including cross-repo sub-issues) so the board stays tidy.
+
+on:
+    issues:
+        types: [closed]
+
+permissions:
+    issues: write
+
+jobs:
+    cascade-close:
+        # Only cascade when the parent was completed (skip "not planned").
+        if: github.event.issue.state_reason != 'not_planned'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/github-script@v7
+              with:
+                  # SUB_ISSUE_TOKEN (a PAT with access to both repos) enables closing
+                  # cross-repo sub-issues. Without it, falls back to the repo-scoped
+                  # GITHUB_TOKEN, which can only close sub-issues in THIS repo.
+                  github-token: ${{ secrets.SUB_ISSUE_TOKEN || secrets.GITHUB_TOKEN }}
+                  script: |
+                      const { owner, repo } = context.repo;
+                      const issue_number = context.issue.number;
+
+                      let subs;
+                      try {
+                        subs = await github.paginate(
+                          'GET /repos/{owner}/{repo}/issues/{issue_number}/sub_issues',
+                          { owner, repo, issue_number }
+                        );
+                      } catch (e) {
+                        core.info(`No sub-issues for #${issue_number}: ${e.message}`);
+                        return;
+                      }
+
+                      for (const sub of subs) {
+                        if (sub.state !== 'open') continue;
+                        const m = String(sub.repository_url || '').match(/repos\/([^/]+)\/([^/]+)$/);
+                        const subOwner = m ? m[1] : owner;
+                        const subRepo = m ? m[2] : repo;
+                        try {
+                          await github.rest.issues.createComment({
+                            owner: subOwner, repo: subRepo, issue_number: sub.number,
+                            body: `Fechada automaticamente: a issue-pai ${owner}/${repo}#${issue_number} foi concluída.`
+                          });
+                          await github.rest.issues.update({
+                            owner: subOwner, repo: subRepo, issue_number: sub.number,
+                            state: 'closed', state_reason: 'completed'
+                          });
+                          core.info(`Closed ${subOwner}/${subRepo}#${sub.number}`);
+                        } catch (e) {
+                          core.warning(
+                            `Could not close ${subOwner}/${subRepo}#${sub.number} ` +
+                            `(cross-repo needs the SUB_ISSUE_TOKEN secret): ${e.message}`
+                          );
+                        }
+                      }
