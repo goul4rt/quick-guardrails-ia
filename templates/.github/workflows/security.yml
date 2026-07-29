@@ -1,0 +1,52 @@
+name: Security
+
+# Segurança em camadas (ver docs/08-seguranca-no-gate.md):
+#   1. secrets-scan  — determinístico, BLOQUEANTE (gitleaks)
+#   2. ai-security-review — semântico, NÃO-bloqueante (comenta achados no PR)
+# Complementa o audit.yml (vulnerabilidade de dependência, mensal).
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  # Secret no diff trava o PR. Determinístico (regex + entropia), falso
+  # positivo raro — o caso perfeito para bloqueio. Exceção legítima vai
+  # em .gitleaksignore com justificativa no commit, nunca desligando o job.
+  secrets-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # varre os commits do PR — secret "removido" no commit seguinte ainda está no histórico
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Review semântico do DIFF (não do repo inteiro) com filtro de falsos
+  # positivos; posta os achados como comentário no PR — recomendação, não
+  # veredito. Não-bloqueante por design: LLM é probabilístico, e check
+  # bloqueante flaky vira bypass cultural. Para endurecer depois, o action
+  # expõe o output findings-count — dá para falhar acima de um limiar.
+  ai-security-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      pull-requests: write # comenta os achados no PR
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      # API key própria com escopo único — nenhum secret de produção toca o gate.
+      - uses: anthropics/claude-code-security-review@main
+        with:
+          claude-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          comment-pr: true

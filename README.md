@@ -34,6 +34,7 @@ Tudo aqui nasceu de uma sequência de PRs no `Instivo/instivo-pesquisador-app` (
 | [05 — Skills versionadas](docs/05-skills-versionadas.md) | `skills-lock.json`: skills de IA fixadas por hash, restauradas no `npm install` |
 | [06 — Fluxo de task](docs/06-fluxo-de-task.md) | `/task` e `/task close`: da issue do Jira ao merge com evidência e review duplo |
 | [07 — Lições aprendidas](docs/07-licoes-aprendidas.md) | Estudo de caso: o que os 5 PRs ensinaram (incluindo o que não foi adotado) |
+| [08 — Segurança no gate](docs/08-seguranca-no-gate.md) | Scanner determinístico bloqueia, IA recomenda: gitleaks + review de IA no diff + triagem de falha |
 
 ### Artefatos prontos (`templates/`)
 
@@ -43,6 +44,7 @@ templates/
 │   ├── workflows/ci.yml            # gate de PR bloqueante (adapte os checks à sua stack)
 │   ├── workflows/ci-docs-noop.yml  # companheiro do paths-ignore (required check nunca trava)
 │   ├── workflows/audit.yml         # npm audit mensal → abre/atualiza issue
+│   ├── workflows/security.yml      # gitleaks (bloqueante) + review de segurança por IA (recomendação)
 │   └── dependabot.yml              # semanal, majors excluídos, minor+patch agrupados
 ├── .claude/
 │   ├── settings.json               # hooks + plugins versionados (guardrails de time)
