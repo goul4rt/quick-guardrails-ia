@@ -63,6 +63,18 @@ templates/
 └── .npmrc                          # save-exact=true
 ```
 
+## Checklist de guardrails
+
+**[`CHECKLIST.md`](CHECKLIST.md)** — lista checável de guardrails sugeridos, com verificação objetiva e ponteiro pro doc/template de cada item. Serve para os dois sentidos: auditar um projeto existente (o que falta?) e implementar do zero (em que ordem?). Copie para o projeto-alvo ou cole numa issue de tracking.
+
+### Usando com um agente de IA
+
+Este repositório foi escrito para ser consumido por um agente. Para implantar ou melhorar guardrails num projeto, aponte o agente para cá com um prompt neste formato:
+
+> Use `goul4rt/metodologias-desenvolvimento-ia` como referência. Rode o `CHECKLIST.md` contra o projeto `<alvo>`: para cada item, verifique com o comando/observação indicado e marque ✅/❌. Para cada ❌, proponha a implementação a partir do template referenciado, adaptando ao stack do projeto (os docs explicam o porquê de cada decisão — siga-os, não só copie o arquivo). Itens marcados ⚠️ ou que envolvem custo ([doc 09](docs/09-custos.md)) exigem minha decisão antes de implementar. Entregue: o checklist preenchido com evidência por item + os PRs/diffs propostos, em ordem de impacto.
+
+Regras para o agente que vier por aqui: **verifique, não presuma** (cada item tem verificação objetiva — rode-a); **adapte, não copie cego** (os placeholders `⟨...⟩` e os `ADAPTING.md` dizem o que muda por projeto); **custo é decisão humana** (nada de serviço pago sem aprovação explícita — [doc 09](docs/09-custos.md)); **gap consciente se registra**, não se esconde.
+
 ## Como adotar em um repositório novo
 
 1. **Contexto**: escreva um `CLAUDE.md` enxuto com regras objetivas ([doc 01](docs/01-contexto-do-projeto.md)).
