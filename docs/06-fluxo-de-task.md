@@ -22,7 +22,16 @@ O close exige **PR já aberto** e produz duas coisas: push validado e **dois com
 
 ### Evidência: um artefato por critério de aceite
 
-Para um app mobile, a prova é `adb`:
+A ferramenta de captura muda por stack; o contrato não:
+
+| Stack | Captura | Log |
+|---|---|---|
+| Mobile (RN/Android) | `adb exec-out screencap` | `adb logcat` filtrado pelo PID do app |
+| Web | Playwright (screenshot por rota/estado) | console do browser via Playwright |
+
+Os artefatos vivem num diretório por task (`.task-evidence/<id>/` ou `docs/qa-logs/<id>/`, gitignorado), com uma `_lib/` compartilhada para o que se repete (post de comentário no tracker, helpers de captura). Detalhe que separa tooling sério de gambiarra: **a lib de evidência tem teste próprio** — o script que posta o comentário no Jira vem com seu `test_*.py`. Tooling de evidência também é código.
+
+Para o app mobile do estudo de caso, a prova é `adb`:
 
 ```
 adb logcat -c                          # limpa ANTES de reproduzir
@@ -64,4 +73,4 @@ O modo `--dry-run` faz **tudo** — evidência, checklist, reviews — exceto pu
 5. **Review duplo com papéis distintos.**
 6. **Dry-run para tudo que toca sistema externo.**
 
-**Fonte**: [`.claude/commands/task.md` do PR #141](https://github.com/Instivo/instivo-pesquisador-app/pull/141).
+**Fonte**: comando `/task` do estudo de caso (entrega E5 — [doc 07](07-licoes-aprendidas.md)), nas variantes mobile (adb) e web (Playwright).

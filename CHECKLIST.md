@@ -28,6 +28,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
 - [ ] Variante de push decidida conscientemente (bloquear todo push × só forçado) e registrada no hook
 - [ ] `(se aplica)` Hook `PostToolUse` de auto-fix no arquivo editado — [template](templates/.claude/hooks/eslint-fix-edited.sh)
   - *Verificar*: rápido (1 arquivo), nunca bloqueia (`exit 0`), silencioso, degrada bem
+- [ ] Hooks de **git** (husky) com disciplina de branch — valem para humano E agente — [template](templates/.husky/pre-commit)
+  - *Verificar*: commit em branch de integração é bloqueado; rebase/merge em andamento passa sem erro
 
 ## 3. Gate de CI — [doc 02](docs/02-gate-de-ci.md)
 
@@ -40,6 +42,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
   - *Verificar*: merge com check vermelho é impossível; OU a ausência é decisão registrada ("gate informativo, disciplina social")
 - [ ] `(se aplica)` `paths-ignore` de docs acompanhado do workflow no-op espelhado — [template](templates/.github/workflows/ci-docs-noop.yml)
   - *Verificar*: os filtros dos dois workflows são espelhos exatos
+- [ ] `(se aplica, plataforma builda preview de PR)` Smoke test do preview disparado por `check_run`, validando identidade do check (`app.id`) — [template](templates/.github/workflows/preview-smoke.yml)
+  - *Verificar*: PR com preview quebrado (5xx) fica com o check de smoke vermelho
 
 ## 4. Supply chain — [doc 03](docs/03-supply-chain.md)
 

@@ -52,4 +52,4 @@ Do PR de origem — note que são todos **verificáveis por comando**:
 - `postinstall` não roda em CI e não quebra o `npm install` offline.
 - Falha forçada propaga (`rc != 0`); falha em `--if-missing` é best-effort (`rc = 0` + aviso).
 
-**Fonte**: PR [#141](https://github.com/Instivo/instivo-pesquisador-app/pull/141).
+**Fonte**: entrega E5 do estudo de caso ([doc 07](07-licoes-aprendidas.md)); o mesmo mecanismo roda também no painel web do caso de origem.

@@ -1,0 +1,83 @@
+name: Preview smoke test
+
+# Valida que o preview de PR buildado pela plataforma de deploy (Cloudflare
+# Pages, Vercel, ... — fora do Actions) DE FATO subiu e responde — não um 5xx.
+# Dispara no check-run que a própria plataforma posta ao terminar o deploy
+# (evento check_run) — sem polling; o job só roda quando o preview existe.
+# Complementa o ci.yml, que não sobe nada.
+#
+# Gotcha: eventos check_run só disparam a partir do workflow já presente na
+# branch default — uma mudança neste arquivo não se autovalida no PR que a
+# introduz.
+on:
+  check_run:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "URL do preview a validar (fallback manual, sem check_run da plataforma)"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-smoke-${{ github.event.check_run.head_sha || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    # Valide a IDENTIDADE do check (app.id), não só o nome — trava contra
+    # check-run forjado com o mesmo nome por outro app/usuário.
+    # Cloudflare Workers and Pages = app.id 85455; ajuste nome e id à sua
+    # plataforma (descubra com: gh api repos/{owner}/{repo}/commits/{sha}/check-runs).
+    if: >
+      github.event_name == 'workflow_dispatch' || (
+        github.event.check_run.name == '⟨nome do check da sua plataforma⟩' &&
+        github.event.check_run.app.id == 85455 &&
+        github.event.check_run.conclusion == 'success'
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUMMARY: ${{ github.event.check_run.output.summary }}
+      MANUAL_URL: ${{ inputs.url }}
+    steps:
+      - name: Resolve a URL do preview
+        id: url
+        run: |
+          set -euo pipefail
+          if [ -n "${MANUAL_URL:-}" ]; then
+            url="$MANUAL_URL"
+          else
+            url=$(printf '%s' "$SUMMARY" | grep -oP "href='\K[^']+" | head -1)
+          fi
+          if [ -z "$url" ]; then
+            echo "::error::não achei a Preview URL (nem no check-run, nem no input manual)"
+            exit 1
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Valida rotas principais (falha só em 5xx)
+        env:
+          BASE: ${{ steps.url.outputs.url }}
+        run: |
+          set -euo pipefail
+          # Liste as rotas de topo do seu app. O objetivo é pegar 5xx (crash
+          # de build/runtime), não validar conteúdo ou auth — redirect de rota
+          # autenticada para login conta como sucesso.
+          routes=(/ /auth /dashboard)
+          fail=0
+          for route in "${routes[@]}"; do
+            code=$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 --retry 2 "${BASE}${route}" || echo 000)
+            echo "[$route] HTTP $code"
+            if [ "$code" = "000" ] || [ "$code" -ge 500 ]; then
+              echo "::error::$route retornou $code"
+              fail=1
+            fi
+          done
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::preview com rota(s) em 5xx — ver log acima"
+            exit 1
+          fi
+          echo "✅ preview ativo, todas as rotas OK — $BASE" >> "$GITHUB_STEP_SUMMARY"

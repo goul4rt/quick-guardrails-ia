@@ -50,4 +50,4 @@ Trade-offs de conviver com isso:
 
 O ponto meta: **todo guardrail simples tem falsos positivos; documente-os em vez de sofisticar o guardrail.**
 
-**Fonte**: PR [#141](https://github.com/Instivo/instivo-pesquisador-app/pull/141) + calibragem da variante force-only em uso no `goul4rt/delfus` (2026-07).
+**Fonte**: entrega E5 do estudo de caso ([doc 07](07-licoes-aprendidas.md)) + calibragem da variante force-only num segundo ecossistema (bot + painel web).

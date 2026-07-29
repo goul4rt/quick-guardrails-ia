@@ -4,9 +4,9 @@ Este arquivo NÃO é carregado pelo agente — é o guia de quem copia o templat
 
 ## O que cada placeholder ⟨...⟩ vira
 
-| Placeholder | Troque por | Exemplo (instância delfus) |
+| Placeholder | Troque por | Exemplo (instância de origem: bot + painel web) |
 |---|---|---|
-| `⟨seus repos⟩` (na description) | Os nomes reais dos repos cobertos — é o que faz a skill disparar sozinha | "the Delfus repos (discord-bot or delfus-v2 / front-end)" |
+| `⟨seus repos⟩` (na description) | Os nomes reais dos repos cobertos — é o que faz a skill disparar sozinha | "the Acme repos (acme-bot or acme-web / front-end)" |
 | `⟨skill de debugging sistemático⟩` | A skill do seu pack, ou instrução inline se não tiver pack | `superpowers:systematic-debugging` (default); `diagnosing-bugs` se cabeludo |
 | `⟨brainstorm curto⟩` / `⟨stress-test da decisão⟩` | Suas skills de alinhamento e de questionamento adversarial | `brainstorming` → `grilling` (`grill-with-docs` se render ADR) |
 | `⟨sua skill de review⟩` / `⟨review⟩` | UM reviewer canônico — o mesmo nome em todas as menções | `code-review` (eixos Standards+Spec) |

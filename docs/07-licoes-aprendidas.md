@@ -1,25 +1,25 @@
-# 07 — Lições aprendidas: estudo de caso dos 5 PRs
+# 07 — Lições aprendidas: estudo de caso de cinco entregas
 
-Linha do tempo real (jul/2026, `Instivo/instivo-pesquisador-app`) e o que cada etapa ensinou — incluindo o que **não** foi adotado.
+Sequência real de cinco entregas num app mobile em produção (React Native) e o que cada etapa ensinou — incluindo o que **não** foi adotado. Números reais; referências internas generalizadas (E1–E5).
 
 ## Linha do tempo
 
 ```
-#123 (24/07, merged)  Gate de CI bloqueante + pins exatos + Dependabot + audit mensal
+E1 (merged)   Gate de CI bloqueante + pins exatos + Dependabot + audit mensal
   └─ registra pendências: 32 vulns conhecidas · secret no APK (escalado)
-#125 (24/07, merged)  npm audit fix disciplinado: 32 → 13 vulns, sem --force
-#131 (24/07, fechado) paths-ignore p/ docs + workflow no-op companheiro
-#130 (27/07, merged)  Lockfile drift: o gate de #123 pega o problema real
-#141 (29/07, aberto)  Skills por hash + hooks de guardrails + /task close com evidência
+E2 (merged)   npm audit fix disciplinado: 32 → 13 vulns, sem --force
+E3 (fechada)  paths-ignore p/ docs + workflow no-op companheiro
+E4 (merged)   Lockfile drift, 3 dias após E1: o gate pega o problema real
+E5 (aberta)   Skills por hash + hooks de guardrails + task close com evidência
 ```
 
-Repare na ordem: primeiro o **gate** (#123), que cria a rede de segurança; só então as mudanças de risco (#125, #130) passam por ela; por fim a camada de agente (#141) opera dentro dela.
+Repare na ordem: primeiro o **gate** (E1), que cria a rede de segurança; só então as mudanças de risco (E2, E4) passam por ela; por fim a camada de agente (E5) opera dentro dela.
 
 ## As lições
 
 ### 1. O gate se paga em dias, não meses
 
-Três dias depois do #123, o `npm ci` da mainline quebrou (#130) por lockfile dessincronizado — um estado que antes passaria silencioso e explodiria na máquina de alguém (ou no build de release). O gate falhando **era o comportamento correto**: a lição é resistir ao reflexo de "consertar o CI" e perguntar primeiro se o CI não está certo.
+Três dias depois de E1, o `npm ci` da mainline quebrou (E4) por lockfile dessincronizado — um estado que antes passaria silencioso e explodiria na máquina de alguém (ou no build de release). O gate falhando **era o comportamento correto**: a lição é resistir ao reflexo de "consertar o CI" e perguntar primeiro se o CI não está certo.
 
 ### 2. Dívida se zera de uma vez, no PR que liga o bloqueio
 
@@ -27,11 +27,11 @@ Três dias depois do #123, o `npm ci` da mainline quebrou (#130) por lockfile de
 
 ### 3. Validar contra baseline, não contra ideal
 
-O #125 mexeu no lockfile com a suíte de testes **já quebrada** (falhas pré-existentes, rastreadas à parte). O critério de aceite não foi "testes verdes" — impossível — e sim "resultado **idêntico** ao baseline". Sem essa disciplina, ou o trabalho trava esperando o mundo perfeito, ou alguém "arruma" teste alheio dentro de um PR de lockfile.
+E2 mexeu no lockfile com a suíte de testes **já quebrada** (falhas pré-existentes, rastreadas à parte). O critério de aceite não foi "testes verdes" — impossível — e sim "resultado **idêntico** ao baseline". Sem essa disciplina, ou o trabalho trava esperando o mundo perfeito, ou alguém "arruma" teste alheio dentro de um PR de lockfile.
 
 ### 4. Required check + skip de workflow = armadilha silenciosa
 
-A pegadinha do #131 (check required + `paths-ignore` → pending eterno) não aparece em teste local nem no PR que a introduz — só quando o primeiro PR só-de-docs trava. O padrão no-op companheiro resolve, ao custo de **dois filtros espelhados para sempre**. O PR foi fechado sem merge; a otimização é opcional, conhecer a armadilha não é.
+A pegadinha de E3 (check required + `paths-ignore` → pending eterno) não aparece em teste local nem no PR que a introduz — só quando o primeiro PR só-de-docs trava. O padrão no-op companheiro resolve, ao custo de **dois filtros espelhados para sempre**. A entrega foi fechada sem merge; a otimização é opcional, conhecer a armadilha não é.
 
 ### 5. Escopo tem borda, e a borda se registra
 
@@ -48,7 +48,7 @@ O hook de git bloqueou um `git commit` legítimo porque a mensagem citava um pad
 
 ### 7. Tudo que o agente entrega é verificável por comando
 
-Padrão transversal aos 5 PRs: critérios de aceitação escritos como **comandos com saída esperada** (`npm ci --dry-run` passa; `rc != 0` propaga; HTTP 200 no upload), não como prosa ("funciona corretamente"). É o que permite a um humano — ou a outro agente — conferir a entrega sem confiar na palavra de quem entregou.
+Padrão transversal às cinco entregas: critérios de aceitação escritos como **comandos com saída esperada** (`npm ci --dry-run` passa; `rc != 0` propaga; HTTP 200 no upload), não como prosa ("funciona corretamente"). É o que permite a um humano — ou a outro agente — conferir a entrega sem confiar na palavra de quem entregou.
 
 ## Anti-lições (o que este caso NÃO diz)
 

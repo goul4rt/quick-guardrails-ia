@@ -6,7 +6,7 @@ Template pronto: [`templates/.github/workflows/ci.yml`](../templates/.github/wor
 
 ## A precondição: zerar a dívida no mesmo PR
 
-O motivo de gates nascerem não-bloqueantes é dívida existente: ninguém liga `eslint` como required com 213 errors na base. A prática que funcionou ([PR #123](https://github.com/Instivo/instivo-pesquisador-app/pull/123)):
+O motivo de gates nascerem não-bloqueantes é dívida existente: ninguém liga `eslint` como required com 213 errors na base. A prática que funcionou (entrega E1 do estudo de caso — [doc 07](07-licoes-aprendidas.md)):
 
 - **213 errors de ESLint → 0** — quase tudo escopo/config (ignores de código vendored, globals por contexto, opções de regra para idiomas legítimos da stack), não reescrita de código. As 35 ocorrências flexibilizadas foram **conferidas uma a uma**.
 - **97 erros de `tsc` → 0** — correções só de tipo + remoção de código morto que os erros revelaram. Zero mudança de comportamento.
@@ -36,13 +36,13 @@ O workflow sozinho **não trava merge nenhum**. É preciso (manual, admin):
 1. Ruleset/branch protection na branch principal exigindo o check `ci`.
 2. Bloqueio de push direto.
 
-Sem isso, o gate é opcional na prática. O PR #123 listou isso como critério de aceitação explícito — é parte da entrega, não um detalhe.
+Sem isso, o gate é opcional na prática. No caso de origem isso foi listado como critério de aceitação explícito — é parte da entrega, não um detalhe.
 
 > ⚠️ **Custo da enforcement**: branch protection em repo **privado** é recurso **pago** (GitHub Pro para conta pessoal, Team para organização). Em repo público, qualquer plano tem. Num privado sem plano pago, o gate roda mas não trava merge — decida conscientemente o que fazer com isso ([doc 09](09-custos.md)).
 
 ## A armadilha do `paths-ignore` + required check
 
-Otimização natural: PR só de docs não precisa rodar o gate pesado. Mas há uma pegadinha do GitHub Actions ([PR #131](https://github.com/Instivo/instivo-pesquisador-app/pull/131)):
+Otimização natural: PR só de docs não precisa rodar o gate pesado. Mas há uma pegadinha do GitHub Actions (entrega E3 do estudo de caso):
 
 > Se `ci` é required e o workflow é pulado por `paths-ignore`, o check fica **pending para sempre** — e trava PRs só-de-docs indefinidamente.
 
@@ -56,6 +56,16 @@ A solução é um **workflow companheiro no-op** ([`ci-docs-noop.yml`](../templa
 
 O nome de job idêntico é **de propósito**: é o que o branch protection exige. Os dois filtros (`paths-ignore` de um, `paths` do outro) precisam ser **espelhos exatos** — se divergirem, volta o estado pending.
 
-> No caso de origem esse PR acabou fechado sem merge (o racional não ficou registrado no PR). A lição (required check + skip = pending eterno) vale independentemente da adoção — e o custo recorrente de manter dois filtros espelhados é um argumento legítimo contra, se o tráfego de PRs só-de-docs for baixo. Ver [doc 07](07-licoes-aprendidas.md).
+> No caso de origem essa entrega acabou fechada sem merge (o racional não ficou registrado). A lição (required check + skip = pending eterno) vale independentemente da adoção — e o custo recorrente de manter dois filtros espelhados é um argumento legítimo contra, se o tráfego de PRs só-de-docs for baixo. Ver [doc 07](07-licoes-aprendidas.md).
 
-**Fonte**: PRs [#123](https://github.com/Instivo/instivo-pesquisador-app/pull/123) e [#131](https://github.com/Instivo/instivo-pesquisador-app/pull/131).
+## O gate não acaba no merge: smoke do preview
+
+Quando a plataforma de deploy (Cloudflare Pages, Vercel, ...) builda um **preview a cada push do PR** fora do Actions, o gate de código passa — e o preview pode estar quebrado (crash de runtime, env faltando). O padrão de um caso real de painel web em produção ([template](../templates/.github/workflows/preview-smoke.yml)):
+
+- **Dispara no `check_run` que a própria plataforma posta** ao terminar o deploy — sem polling; o job só roda quando o preview existe.
+- **Valida a identidade do check** (`check_run.app.id`), não só o nome — check-run com nome forjado por outro app não dispara o smoke.
+- **Falha só em 5xx/timeout** nas rotas principais — o objetivo é pegar crash de build/runtime, não validar conteúdo ou auth.
+- **Fallback manual** (`workflow_dispatch` com a URL) para quando o check-run não veio.
+- **Gotcha documentado**: eventos `check_run` só disparam com o workflow já presente na branch default — a mudança não se autovalida no PR que a introduz.
+
+**Fonte**: entregas E1 e E3 do estudo de caso ([doc 07](07-licoes-aprendidas.md)) + smoke de preview de um painel web em produção.

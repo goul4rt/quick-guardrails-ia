@@ -43,7 +43,7 @@ O `README.md` ganha uma seção **"Desenvolvendo com IA"** explicando à equipe:
 
 Quando o trabalho precisou fugir da convenção (um PR de tooling apontando `task/*` direto para `master`, fora do fluxo padrão), a exceção foi **declarada no corpo do PR** com a justificativa e o registro explícito de que a convenção não mudou:
 
-> Este PR aponta `task/psq-769` **direto para `master`**, o que foge da convenção do `CLAUDE.md` (...). Exceção **intencional e pontual**: é trabalho de tooling/config (`chore`), sem código de app (...). Decisão registrada aqui a pedido; a convenção não foi alterada.
+> Este PR aponta `task/<id>` **direto para `master`**, o que foge da convenção do `CLAUDE.md` (...). Exceção **intencional e pontual**: é trabalho de tooling/config (`chore`), sem código de app (...). Decisão registrada aqui a pedido; a convenção não foi alterada.
 
 A alternativa — quebrar a regra em silêncio — corrói o contrato: se o agente vê exceções não explicadas no histórico, aprende que as regras são opcionais.
 
@@ -56,4 +56,4 @@ A alternativa — quebrar a regra em silêncio — corrói o contrato: se o agen
 | Documentar o que o código já mostra | Estrutura de pastas muda; deixe o mapa mínimo e aponte referências vivas |
 | Regra sem porquê | Vira carga cognitiva morta; com porquê, o agente generaliza para casos novos |
 
-**Fonte**: [`CLAUDE.md` e `README.md` do instivo-pesquisador-app](https://github.com/Instivo/instivo-pesquisador-app) (PR [#141](https://github.com/Instivo/instivo-pesquisador-app/pull/141)).
+**Fonte**: `CLAUDE.md` e `README.md` do app mobile do estudo de caso (entrega E5 — [doc 07](07-licoes-aprendidas.md)).

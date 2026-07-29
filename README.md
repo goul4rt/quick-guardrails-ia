@@ -4,15 +4,7 @@ Práticas, guardrails e artefatos prontos para desenvolver software com agentes 
 
 **Guideline formal de 0 → funcionando sem orçamento**: regras locais (hooks, configs versionadas), ferramentas OSS e recursos públicos/gratuitos. A única base paga assumida é a assinatura do Claude Code que você já tem. Peça que exige serviço externo pago ou cobrança por token **não entra nos templates** — a regra de admissão e a tabela de custos estão no [doc 09](docs/09-custos.md).
 
-Tudo aqui nasceu de uma sequência de PRs no `Instivo/instivo-pesquisador-app` (app React Native em produção), onde um agente de IA passou a trabalhar com gate de CI bloqueante, supply chain travada, guardrails de git e fluxo de task com evidência obrigatória:
-
-| PR | Tema | Estado |
-|---|---|---|
-| [#123](https://github.com/Instivo/instivo-pesquisador-app/pull/123) | Gate de CI 100% bloqueante + pins exatos + Dependabot + auditoria mensal | Merged |
-| [#125](https://github.com/Instivo/instivo-pesquisador-app/pull/125) | `npm audit fix` disciplinado (32 → 13 vulnerabilidades, sem `--force`) | Merged |
-| [#130](https://github.com/Instivo/instivo-pesquisador-app/pull/130) | Lockfile dessincronizado — o gate pegou o problema real | Merged |
-| [#131](https://github.com/Instivo/instivo-pesquisador-app/pull/131) | `paths-ignore` para docs + workflow no-op (pegadinha do required check) | Fechado sem merge |
-| [#141](https://github.com/Instivo/instivo-pesquisador-app/pull/141) | Skills versionadas por hash + hooks de guardrails + `/task close` com evidência no Jira | Aberto |
+Tudo aqui nasceu de trabalho real em **três codebases em produção** — um app mobile (React Native), um painel web (Next.js) e um bot (Node) — onde agentes de IA passaram a operar com gate de CI bloqueante, supply chain travada, guardrails de git e fluxo de task com evidência obrigatória. Os números e as lições são reais; as referências internas foram generalizadas para o material servir de base a qualquer projeto. O estudo de caso principal está no [doc 07](docs/07-licoes-aprendidas.md).
 
 ## Princípios
 
@@ -49,6 +41,7 @@ templates/
 │   ├── workflows/ci-docs-noop.yml  # companheiro do paths-ignore (required check nunca trava)
 │   ├── workflows/audit.yml         # npm audit mensal → abre/atualiza issue
 │   ├── workflows/security.yml      # gitleaks CLI (free, bloqueante) — secrets no histórico
+│   ├── workflows/preview-smoke.yml # valida que o preview de deploy responde (via check_run)
 │   ├── workflows/close-sub-issues.yml # cascata: pai fechada → fecha sub-issues (cross-repo)
 │   └── dependabot.yml              # semanal, majors excluídos, minor+patch agrupados
 ├── .claude/
@@ -57,6 +50,8 @@ templates/
 │   │   ├── block-dangerous-git.sh  # PreToolUse: bloqueia git destrutivo
 │   │   └── eslint-fix-edited.sh    # PostToolUse: auto-fix só no arquivo editado
 │   └── skills/routing-work/        # skill de roteamento por tiers (copiável; ver ADAPTING.md)
+├── .husky/
+│   └── pre-commit                  # disciplina de branch no git — vale p/ humano e agente
 ├── scripts/
 │   ├── skills-install.mjs          # restaura skills do lock (postinstall seguro)
 │   └── jira-attach.sh              # anexa evidência a issue do Jira via REST

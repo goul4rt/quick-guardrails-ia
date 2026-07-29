@@ -28,7 +28,7 @@ Por que não bloquear? Vulnerabilidade nova em dep transitiva não é culpa do P
 
 ### 4. `npm audit fix` disciplinado
 
-Quando a triagem decide corrigir ([PR #125](https://github.com/Instivo/instivo-pesquisador-app/pull/125), 32 → 13 vulnerabilidades):
+Quando a triagem decide corrigir (entrega E2 do estudo de caso, 32 → 13 vulnerabilidades):
 
 - **Nunca `--force`** — no caso real, o `--force` teria instalado um *downgrade* destrutivo de major (`aws-sdk` 2.x → 1.x). O fix fica dentro dos ranges; deps diretas seguem pinadas.
 - **Validar contra baseline, não contra zero**: a suíte tinha falhas pré-existentes; o critério foi "resultado **idêntico** ao baseline com o lock antigo" (mesmos passed/failed), não "tudo verde".
@@ -37,7 +37,7 @@ Quando a triagem decide corrigir ([PR #125](https://github.com/Instivo/instivo-p
 
 ## Quando o gate morde: lockfile drift
 
-Dias depois do pin, o `npm ci` da mainline quebrou com EUSAGE ([PR #130](https://github.com/Instivo/instivo-pesquisador-app/pull/130)): commits recentes mudaram a resolução de deps (uma ferramenta pinada trocou de dependência interna), mas o lock não foi regenerado.
+Dias depois do pin, o `npm ci` da mainline quebrou com EUSAGE (entrega E4): commits recentes mudaram a resolução de deps (uma ferramenta pinada trocou de dependência interna), mas o lock não foi regenerado.
 
 Leituras corretas do incidente:
 
@@ -47,6 +47,6 @@ Leituras corretas do incidente:
 
 ## Limite de escopo: escalar o que não é seu
 
-Durante o trabalho do PR #123 apareceu um problema de arquitetura fora do escopo (secret de cloud embutido no APK pelo pipeline de release — extraível por decompilação). A resposta certa não foi "aproveitar e corrigir" nem ignorar: foi **registrar no PR como pendência conhecida e escalar à gestão**. Agente (e humano) disciplinado não expande escopo silenciosamente em área sensível.
+Durante o trabalho de E1 apareceu um problema de arquitetura fora do escopo (secret de cloud embutido no binário pelo pipeline de release — extraível por decompilação). A resposta certa não foi "aproveitar e corrigir" nem ignorar: foi **registrar no PR como pendência conhecida e escalar à gestão**. Agente (e humano) disciplinado não expande escopo silenciosamente em área sensível.
 
-**Fonte**: PRs [#123](https://github.com/Instivo/instivo-pesquisador-app/pull/123), [#125](https://github.com/Instivo/instivo-pesquisador-app/pull/125) e [#130](https://github.com/Instivo/instivo-pesquisador-app/pull/130).
+**Fonte**: entregas E1, E2 e E4 do estudo de caso ([doc 07](07-licoes-aprendidas.md)).

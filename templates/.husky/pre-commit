@@ -1,0 +1,42 @@
+#!/usr/bin/env sh
+# Hook de git (husky): disciplina de branch no commit — vale para humano E
+# agente, diferente dos hooks do Claude Code (.claude/hooks), que só valem
+# para o agente. As duas camadas se complementam.
+#
+# O que faz: valida o padrão do nome da branch e bloqueia commit direto nas
+# branches de integração (só branches de trabalho recebem commit). Adapte os
+# prefixos ao fluxo do seu repo.
+. "$(dirname -- "$0")/_/husky.sh"
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Detached HEAD (rebase, cherry-pick, bisect): não é commit de trabalho — passa.
+if [ "$branch" = "HEAD" ]; then
+  exit 0
+fi
+
+# Rebase / cherry-pick / merge em andamento: os commits são do próprio git — passa.
+# Sem esses skips o hook quebra operações legítimas e vira incentivo a --no-verify.
+if [ -d ".git/rebase-merge" ] || \
+   [ -d ".git/rebase-apply" ] || \
+   [ -f ".git/CHERRY_PICK_HEAD" ] || \
+   [ -f ".git/MERGE_HEAD" ]; then
+  exit 0
+fi
+
+# Nome de branch fora do padrão: bloqueia com a lista do que é aceito.
+if ! echo "$branch" | grep -Eq '^(hotfix|release|feat|fix|task)/.*'; then
+  echo "❌ Nome de branch inválido!"
+  echo "Use: hotfix/, release/, feat/, fix/, task/"
+  exit 1
+fi
+
+# Branches de integração recebem merge, nunca commit direto.
+case "$branch" in
+  release/*|hotfix/*|feat/*|fix/*)
+    echo "❌ Commits diretos não são permitidos em branches $branch"
+    exit 1
+    ;;
+esac
+
+npx --no-install lint-staged

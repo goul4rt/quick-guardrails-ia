@@ -4,7 +4,7 @@ Guardrail não é só check de pipeline. **Guardrail é qualquer mecanismo que i
 
 Templates prontos: [`close-sub-issues.yml`](../templates/.github/workflows/close-sub-issues.yml) · [`routing-work/`](../templates/.claude/skills/routing-work/SKILL.md) (skill copiável + guia de adaptação)
 
-> **Origem**: inventário do ecossistema `delfus` (`goul4rt/discord-bot` + `delfus-v2`), onde estes mecanismos existiam em produção antes de serem reconhecidos como guardrails. Todos free (regra do [doc 09](09-custos.md)).
+> **Origem**: inventário de um segundo ecossistema real — dois repos em produção (um bot e um painel web) que compartilham banco e contrato de API — onde estes mecanismos existiam antes de serem reconhecidos como guardrails. Todos free (regra do [doc 09](09-custos.md)).
 
 ## O espectro: do mais duro ao mais macio
 
@@ -14,7 +14,7 @@ Templates prontos: [`close-sub-issues.yml`](../templates/.github/workflows/close
 | 2. **Gate de CI + branch protection** | Check bloqueante | O merge **não acontece** | `ci.yml` ([doc 02](02-gate-de-ci.md)), `security.yml` ([doc 08](08-seguranca-no-gate.md)) |
 | 3. **Automação de invariante** | Workflow que corrige estado inconsistente sozinho | O estado **se auto-corrige** | Cascata de fechamento de sub-issues (abaixo) |
 | 4. **Contrato de contexto** | Regra objetiva no `CLAUDE.md`, carregada toda sessão | O agente **sabe e obedece** (probabilístico, mas presente sempre) | Anti-patterns com porquê; regras de STOP ([doc 01](01-contexto-do-projeto.md) e abaixo) |
-| 5. **Skill de roteamento** | Processo invocado por gatilho, com critérios observáveis | O trabalho **entra no fluxo certo** | `routing-delfus-work` (abaixo) |
+| 5. **Skill de roteamento** | Processo invocado por gatilho, com critérios observáveis | O trabalho **entra no fluxo certo** | skill de roteamento por tiers (abaixo) |
 | 6. **Memória do agente** | Regra aprendida de feedback, recuperada por relevância | O erro **tende** a não repetir | "nunca stash pop cego", "grounding antes de aceitar premissa de issue" |
 
 **Regra de escolha**: para cada modo de falha, use o nível mais duro que o custo permite. Perda de trabalho → nível 1 (hook). Regressão de código → nível 2 (gate). Estado de board inconsistente → nível 3 (automação). Convenção de arquitetura → nível 4 (contrato). Processo desproporcional → nível 5 (roteamento). Preferência pessoal de fluxo → nível 6 (memória). Descer um nível (ex.: confiar convenção crítica só à memória) é aceitar que a falha vai acontecer de vez em quando.
@@ -30,7 +30,7 @@ O GitHub **não fecha sub-issues quando a issue-pai fecha** — cada pai conclu�
 
 ## Nível 4 na prática: a regra de STOP
 
-Além dos anti-patterns com porquê ([doc 01](01-contexto-do-projeto.md)), o `CLAUDE.md` do delfus tem um padrão que merece nome: a **regra de STOP** — para operações onde o caminho "resolver o erro" é catastrófico:
+Além dos anti-patterns com porquê ([doc 01](01-contexto-do-projeto.md)), o `CLAUDE.md` do caso de origem tem um padrão que merece nome: a **regra de STOP** — para operações onde o caminho "resolver o erro" é catastrófico:
 
 > Se o `db push` pedir `--accept-data-loss`, **PARE** — rode `db pull`, re-adicione seu model e pushe de novo. **NUNCA** passe `--accept-data-loss` para silenciar.
 
@@ -38,7 +38,7 @@ A anatomia: (1) o sintoma exato que o agente vai ver, (2) a ordem de parar, (3) 
 
 ## Nível 5 na prática: cerimônia proporcional por tiers
 
-A skill `routing-delfus-work` resolve dois modos de falha opostos: trabalho grande sem processo (caos) e trabalho trivial afogado em processo (teatro). O princípio de abertura:
+A skill de roteamento do caso de origem resolve dois modos de falha opostos: trabalho grande sem processo (caos) e trabalho trivial afogado em processo (teatro). O princípio de abertura:
 
 > Cerimônia escala com o tamanho do trabalho, não com a vontade de rigor.
 
@@ -57,7 +57,9 @@ Governança da skill: vive **nos dois repos**, e só muda com os dois sincroniza
 
 ## Complementos menores do inventário
 
+- **Nível 1 — hooks de git (husky)**: enquanto os hooks do Claude Code valem só para o agente, `pre-commit`/`pre-push` valem para **humano e agente**: validam o padrão do nome da branch e bloqueiam commit direto nas branches de integração — [template](../templates/.husky/pre-commit). O detalhe que separa hook bom de hook chato: **skips explícitos** para detached HEAD e rebase/cherry-pick/merge em andamento — sem eles o hook quebra operações legítimas do git e vira incentivo cultural ao `--no-verify`.
 - **Nível 1 — proxy de CLI por hook**: um `PreToolUse` global reescreve comandos de dev para versões com saída otimizada em tokens (`git status` → `rtk git status`, transparente). Guardrail de **custo**: o agente não precisa lembrar de economizar contexto; o harness economiza por ele.
+- **Nível 2 — smoke do preview de deploy**: o gate de código não prova que o deploy sobe; um workflow disparado pelo `check_run` da plataforma valida as rotas principais do preview — ver [doc 02](02-gate-de-ci.md) e [template](../templates/.github/workflows/preview-smoke.yml).
 - **Adaptador de vocabulário**: um `triage-labels.md` mapeando os papéis canônicos que as skills falam (`needs-triage`, `ready-for-agent`, ...) para as labels reais do tracker. Skills genéricas + tabela local = skills portáveis sem fork.
 - **Nível 6, honestamente**: regras de memória ("nunca `stash pop` cego", "push via credential helper do gh", "issue de backlog pode alegar infra que não existe — grounding antes de aceitar premissa") funcionam, mas por sessão e por relevância. Quando uma regra de memória falha pela segunda vez, é sinal de que ela quer subir de nível — virar hook, contrato ou automação.
 
