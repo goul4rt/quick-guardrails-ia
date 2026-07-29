@@ -1,0 +1,31 @@
+name: CI (docs no-op)
+
+# Companheiro do gate real (ci.yml). Quando o PR/push mexe SÓ em docs, o ci.yml
+# é pulado por paths-ignore. Este roda no caso inverso (só docs) e reporta o
+# check "ci" como sucesso — assim um required check "ci" nunca fica travado
+# esperando um run que não veio. Mesmo nome de job ("ci") de propósito: é o que
+# o branch protection exige. Não roda nada pesado.
+#
+# ATENÇÃO: os `paths` daqui devem ser o espelho EXATO dos `paths-ignore` do
+# ci.yml — se divergirem, volta o estado "pending para sempre".
+on:
+  pull_request:
+    paths:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+  push:
+    branches: [master]
+    paths:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Mudança só de docs — gate real (ci.yml) pulado por paths-ignore. Check 'ci' OK."

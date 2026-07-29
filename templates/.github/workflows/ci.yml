@@ -1,0 +1,71 @@
+name: CI
+
+# Gate de PR. Roda em todo PR (qualquer destino: task->feat/fix,
+# feat/fix->master, hotfix->master, ...) e no push pra master.
+# O build.yml continua sendo o pipeline de release (roda no release created).
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+# Só leitura; nenhum secret de produção toca este gate.
+permissions:
+  contents: read
+
+# Cancela runs obsoletos SÓ em PR (push novo no mesmo PR mata o run do commit
+# anterior). Em push na master não cancela: todo commit de mainline roda inteiro.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # step pendurado não segura o runner pelas 6h default
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # commitlint precisa do range de commits do PR
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22.14.0"
+          cache: npm
+
+      # Deps vêm todas do npm público (nenhum pacote resolve do GitHub Packages),
+      # então npm ci puro basta — sem .npmrc/token. HUSKY=0: não roda git hooks no CI.
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        env:
+          HUSKY: 0
+
+      # ---------- Checks — todos bloqueantes (falhou, travou o PR) ----------
+      - name: Commitlint (padrão de commits do PR)
+        if: github.event_name == 'pull_request'
+        run: npx commitlint --from "${{ github.event.pull_request.base.sha }}" --to "${{ github.event.pull_request.head.sha }}" --verbose
+
+      - name: Lint (ESLint — 0 errors; warnings não bloqueiam)
+        run: npm run lint:ci
+
+      - name: DB schema em sync (drizzle-kit check)
+        run: npx drizzle-kit check
+
+      - name: Format (prettier — respeita .prettierignore)
+        run: npx prettier --check .
+
+      - name: Typecheck (tsc — 0 errors)
+        run: npm run typecheck
+
+      - name: Testes (jest)
+        run: npm test -- --ci
+
+      # ---------- Resumo no PR ----------
+      - name: Resumo do gate
+        if: always()
+        run: |
+          {
+            echo "## Gate de CI"
+            echo ""
+            echo "Todos os checks são **bloqueantes** — regressão em qualquer um trava o PR:"
+            echo "commitlint · eslint · drizzle-check · prettier · tsc · jest."
+          } >> "$GITHUB_STEP_SUMMARY"

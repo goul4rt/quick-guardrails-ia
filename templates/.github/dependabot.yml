@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # Actions dos workflows (checkout, setup-node, ...) — PRs de major/minor + advisories.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+
+  # Deps do app. Só security updates + patch/minor agrupados — major de lib RN
+  # quebra build nativo e merece PR manual, não bot.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: build
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      minor-e-patch:
+        update-types: [minor, patch]

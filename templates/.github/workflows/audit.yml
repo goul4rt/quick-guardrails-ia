@@ -1,0 +1,58 @@
+name: Audit
+
+# Auditoria mensal de dependências. Não bloqueia nada: se houver vulnerabilidade
+# high/critical, abre (ou atualiza) uma issue com o relatório pra triagem humana.
+on:
+  schedule:
+    - cron: "0 9 1 * *" # dia 1 de cada mês, 09:00 UTC
+  workflow_dispatch: # roda manual quando quiser
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22.14.0"
+          cache: npm
+
+      # Audita direto do lockfile — não precisa instalar node_modules.
+      - name: npm audit (high/critical)
+        id: audit
+        run: |
+          set +e
+          npm audit --audit-level=high > audit.txt 2>&1
+          echo "failed=$?" >> "$GITHUB_OUTPUT"
+          cat audit.txt
+
+      - name: Abre/atualiza issue com o relatório
+        if: steps.audit.outputs.failed != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "Rodada de \`npm audit --audit-level=high\` de $(date -u +%Y-%m-%d) encontrou vulnerabilidades high/critical."
+            echo ""
+            echo '```'
+            tail -60 audit.txt
+            echo '```'
+            echo ""
+            echo "Triagem: ver árvore de decisão (alcançável em runtime? fix disponível?). Fix não-breaking: \`npm audit fix\` (nunca \`--force\` automático)."
+            echo ""
+            echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } > body.md
+
+          TITLE="npm audit: vulnerabilidades high/critical"
+          EXISTING=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body-file body.md
+          else
+            gh issue create --title "$TITLE" --body-file body.md
+          fi
