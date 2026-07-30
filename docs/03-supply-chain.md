@@ -12,6 +12,8 @@ Todas as deps diretas pinadas na **versão exata já instalada** (extraída do l
 
 Resultado: `^`/`~` deixam de existir. Um `npm install` de rotina nunca puxa versão nova por baixo.
 
+O mesmo princípio vale para **GitHub Actions**: `uses: actions/checkout@v7` é pin de *tag* — e tag é mutável (quem controla o repo da action pode reapontá-la; foi o vetor do ataque ao `tj-actions/changed-files` em 2025). A única referência imutável é o **SHA de 40 chars**, com a versão em comentário para leitura humana (`uses: actions/checkout@3d3c42e5... # v7`). Os templates deste repo vêm pinados assim; o ecossistema `github-actions` do Dependabot (peça 2) propõe os bumps mantendo o formato.
+
 ### 2. Dependabot com majors excluídos
 
 Semanal, com duas decisões deliberadas ([template](../templates/.github/dependabot.yml)):
