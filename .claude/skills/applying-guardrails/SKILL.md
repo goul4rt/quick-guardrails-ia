@@ -5,7 +5,7 @@ description: Use when asked to apply, audit, or bootstrap guardrails in a repo (
 
 # Aplicando guardrails em um repo
 
-Referência: o repo `metodologias-desenvolvimento-ia` — clone local se existir (ex.: `~/workspace/metodologias-desenvolvimento-ia`); senão, clone raso de `github.com/goul4rt/metodologias-desenvolvimento-ia`. Esta skill não resume o guideline; ela impõe o fluxo sobre ele: **auditar → decidir → implementar**, nessa ordem, cada fase com seu artefato. Implementar sem auditar é o modo de falha nº 1 — competência técnica não substitui o fluxo.
+Referência: o repo `metodologias-desenvolvimento-ia`. Se esta skill veio via plugin, o guideline completo já está no disco — `CHECKLIST.md`, `docs/` e `templates/` ficam três níveis acima deste arquivo. Senão: clone local (ex.: `~/workspace/metodologias-desenvolvimento-ia`) ou clone raso de `github.com/goul4rt/metodologias-desenvolvimento-ia`. Esta skill não resume o guideline; ela impõe o fluxo sobre ele: **auditar → decidir → implementar**, nessa ordem, cada fase com seu artefato. Implementar sem auditar é o modo de falha nº 1 — competência técnica não substitui o fluxo.
 
 ## Fase 1 — Auditoria (sempre primeiro)
 
