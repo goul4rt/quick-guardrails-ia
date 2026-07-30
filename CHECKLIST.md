@@ -97,6 +97,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
 ## 7. Meta — [docs 07](docs/07-licoes-aprendidas.md), [09](docs/09-custos.md)
 
 - [ ] Custos conferidos para o **seu** cenário (público/privado × pessoal/org) — tabela do [doc 09](docs/09-custos.md)
+- [ ] `(se aplica, repo privado)` Minutos de Actions auditados: gate em job único, sem `sleep` em runner, sem revalidação de merge (`push: main` + gate de PR), piso de 1 min/job das automações conhecido — [doc 09](docs/09-custos.md)
+  - *Verificar*: soma dos jobs do mês (arredondados p/ cima) cabe na cota com folga; workflow que não é gate roda por cron, não por push
 - [ ] Nada por token / serviço externo obrigatório no caminho crítico do pipeline
 - [ ] Exceções de convenção **documentadas no PR** que as comete, não escondidas
 - [ ] Limites e capes explícitos — nenhum truncamento silencioso em scan/automação

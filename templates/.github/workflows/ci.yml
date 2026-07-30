@@ -23,6 +23,9 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Um job só, checks em série barato→caro: cada job paralelo pagaria o próprio
+  # npm ci e arredondaria pra cima no minuto — em repo privado isso quase dobra
+  # o custo do gate (doc 09). Latência de PR não paga a conta de Actions.
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 15 # step pendurado não segura o runner pelas 6h default
