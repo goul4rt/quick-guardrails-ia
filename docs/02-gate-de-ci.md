@@ -31,12 +31,13 @@ Decisões que valem copiar (todas comentadas no template):
 
 ## CI verde que não prova nada
 
-Antes de bloquear merge, o check precisa **falhar quando o trabalho falha** — e há dois jeitos clássicos de perder isso sem perceber (ambos flagrados num pipeline público de "AI guardrail" examinado em jul/2026, com 31 de 38 runs `success` e `BUILD FAILED` no log):
+Antes de bloquear merge, o check precisa **falhar quando o trabalho falha** — e há três jeitos clássicos de perder isso sem perceber (os dois primeiros flagrados num pipeline público de "AI guardrail" examinado em jul/2026, com 31 de 38 runs `success` e `BUILD FAILED` no log; o terceiro num dos três codebases de origem):
 
 - **Exit code engolido por pipe.** `./build 2>&1 | tee build.log` reporta o status do `tee`, sempre 0. Regra: `set -o pipefail` no topo de todo step multi-comando — ou `${PIPESTATUS[0]}` **lido e usado**. No caso examinado, o exit code era capturado em `$GITHUB_OUTPUT` e nunca lido em lugar nenhum: pior que não capturar, porque parece rigor.
 - **Veredito de gate cacheado.** `actions/cache` guardando o *resultado* de um scan por hash de árvore faz o step virar `skipped` — o badge verde vira o `cat` de um arquivo antigo. Cache é para dependência e artefato; veredito de checagem se recomputa sempre. Se o custo dói, reduza o escopo (diff-only), não memoize o resultado.
+- **Step deletado de carona num refactor.** No bot Node do estudo de caso, um refactor de feature co-autorado por IA (dezenas de arquivos) incluiu `ci.yml | 1 deletion`: a linha que rodava a suíte de testes. O job manteve o nome "Test", continuou fazendo checkout + install + codegen e continuou **verde por ~4 meses executando zero testes** — 800+ testes fora do gate, descoberto só em auditoria. Ninguém revisa 1 linha de workflow no meio de um diff de 50 arquivos. Antídoto: **mudança em `.github/workflows/` é PR dedicado, nunca carona** — qualquer diff de workflow dentro de PR de feature é red flag automático; e o step que executa o gate leva comentário-sentinela ("não remover: já sumiu uma vez sem ninguém notar, <commit>").
 
-O antídoto sistemático para gate quebrado-mas-verde é o canário por gate — [doc 11](11-teste-o-guardrail.md).
+O antídoto sistemático para os dois primeiros é o canário por gate — [doc 11](11-teste-o-guardrail.md). O terceiro é imune ao canário (o step deletado leva o canário junto); a defesa é a regra de PR dedicado acima.
 
 ## Branch protection: o passo que ninguém automatiza
 
