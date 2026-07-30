@@ -8,8 +8,8 @@
 
 **Guardrails que não dependem do agente obedecer** — gate de CI bloqueante, hooks determinísticos, supply chain travada e evidência obrigatória, de 0 → funcionando **sem orçamento**.
 
-[![ci](https://github.com/goul4rt/metodologias-desenvolvimento-ia/actions/workflows/ci.yml/badge.svg)](https://github.com/goul4rt/metodologias-desenvolvimento-ia/actions/workflows/ci.yml)
-[![license: MIT](https://img.shields.io/github/license/goul4rt/metodologias-desenvolvimento-ia)](LICENSE)
+[![ci](https://github.com/goul4rt/metodologias-desenvolvimento-ia/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/goul4rt/metodologias-desenvolvimento-ia/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![last commit](https://img.shields.io/github/last-commit/goul4rt/metodologias-desenvolvimento-ia)](https://github.com/goul4rt/metodologias-desenvolvimento-ia/commits/master)
 
 </div>
