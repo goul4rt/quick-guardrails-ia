@@ -1,6 +1,6 @@
 {
   "name": "metodologias",
-  "description": "Guardrails para desenvolvimento com agentes de IA — skills do guideline metodologias-desenvolvimento-ia",
+  "description": "Guardrails para desenvolvimento com agentes de IA: skills do guideline quick-guardrails-ia",
   "owner": { "name": "goulart" },
   "plugins": [
     {

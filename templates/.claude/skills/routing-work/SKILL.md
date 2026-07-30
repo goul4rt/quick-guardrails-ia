@@ -7,7 +7,7 @@ description: Use when starting any development task in ⟨seus repos⟩, when de
 
 Cerimônia escala com o tamanho do trabalho, não com a vontade de rigor. Decisão e spec vivem num lugar só; código e gates vivem em cada repo.
 
-## Tiers — classifique ANTES de invocar qualquer skill
+## Tiers: classifique ANTES de invocar qualquer skill
 
 | Tier | Critério observável | Fluxo |
 |---|---|---|
@@ -29,13 +29,13 @@ Cerimônia escala com o tamanho do trabalho, não com a vontade de rigor. Decis�
 
 ## Decisões fixas
 
-- **UM reviewer por diff** — ⟨sua skill de review⟩; não somar reviewers.
+- **UM reviewer por diff**: ⟨sua skill de review⟩; não somar reviewers.
 - Verificação com evidência fresca antes de qualquer "pronto", em todo tier ≥ T1.
-- ⟨proibições do seu contexto — ex.: worktrees se você roda múltiplas instâncias no mesmo checkout⟩
+- ⟨proibições do seu contexto, ex.: worktrees se você roda múltiplas instâncias no mesmo checkout⟩
 
 ## "Verde" por repo
 
-- **⟨repo A⟩**: ⟨comandos do gate local⟩ ⟨— comparado ao baseline, se a suíte carrega falhas pré-existentes⟩
+- **⟨repo A⟩**: ⟨comandos do gate local⟩ ⟨, comparado ao baseline, se a suíte carrega falhas pré-existentes⟩
 - **⟨repo B⟩**: ⟨comandos do gate local⟩
 
 ## Erros comuns
