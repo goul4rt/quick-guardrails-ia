@@ -47,6 +47,16 @@ Gotcha sem contexto vira superstição; com contexto, vira conhecimento transfer
 
 O `README.md` ganha uma seção **"Desenvolvendo com IA"** explicando à equipe: o que o `CLAUDE.md` é, quais comandos de projeto existem (`/task`), como as skills chegam na máquina de cada dev e quais plugins instalar. O contrato do agente e o onboarding do humano apontam um para o outro.
 
+### 5. `AGENTS.md`: o mesmo contrato para qualquer agente
+
+`AGENTS.md` é o padrão neutro de arquivo de contexto (aberto pela OpenAI em 2025, hoje sob a Agentic AI Foundation da Linux Foundation; lido por Codex, Cursor, Copilot, Jules, Gemini CLI e afins). A prática free é uma linha:
+
+```bash
+ln -s CLAUDE.md AGENTS.md   # versionado — um contrato, N agentes
+```
+
+O `CLAUDE.md` continua sendo a fonte única; o symlink só dá o nome padrão que os outros agentes procuram. **Nunca duplique o conteúdo em dois arquivos** — contratos duplicados divergem em silêncio, e cada agente passa a operar sob regras diferentes ([doc 13](13-evidencias-da-literatura.md) tem a evidência de que arquivo de contexto ruim é pior que nenhum).
+
 ## Exceções documentadas, não escondidas
 
 Quando o trabalho precisou fugir da convenção (um PR de tooling apontando `task/*` direto para `master`, fora do fluxo padrão), a exceção foi **declarada no corpo do PR** com a justificativa e o registro explícito de que a convenção não mudou:

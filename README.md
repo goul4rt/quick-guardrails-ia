@@ -35,6 +35,7 @@ Tudo aqui nasceu de trabalho real em **três codebases em produção** — um ap
 | [11 — Teste o guardrail](docs/11-teste-o-guardrail.md) | Canário por gate: must-block/must-pass no CI — guardrail sem teste quebra em silêncio |
 | [12 — Fronteira runtime](docs/12-fronteira-runtime.md) | Guardrails de dev × de runtime de LLM: o que transferiu, e as opções OSS (com ressalvas) para quem constrói produto |
 | [13 — Evidências da literatura](docs/13-evidencias-da-literatura.md) | Os números públicos (Veracode, GitClear, USENIX, DORA, RCTs) que sustentam cada doc — e o que a literatura recomenda mas ficou fora por custo |
+| [14 — Força de teste](docs/14-forca-de-teste.md) | Cobertura mede execução, não verificação: mutation testing, property-based testing e cobertura no código novo do PR |
 
 ### Artefatos prontos (`templates/`)
 
@@ -60,6 +61,7 @@ templates/
 ├── scripts/
 │   ├── skills-install.mjs          # restaura skills do lock (postinstall seguro)
 │   ├── jira-attach.sh              # anexa evidência a issue do Jira via REST
+│   ├── diff-coverage.mjs           # cobertura nas linhas novas do PR (doc 14)
 │   └── test-guardrails.sh          # canário do hook: must-block/must-pass (doc 11)
 └── .npmrc                          # save-exact=true
 ```

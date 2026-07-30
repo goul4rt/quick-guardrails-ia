@@ -44,6 +44,16 @@ Este repositório é um guideline formal de **0 → funcionando sem orçamento**
 
 Registrar o que ficou de fora **e por quê** é o mesmo padrão do [doc 03](03-supply-chain.md) (as 13 vulnerabilidades não corrigidas, documentadas): dívida e limite visíveis, não silenciosos.
 
+### ⚪ Fora por escopo (não por custo)
+
+Peças que a literatura recomenda ([doc 13](13-evidencias-da-literatura.md)), têm caminho free, e mesmo assim ficaram de fora — a razão é valor, não preço:
+
+| Peça | Por que não entra |
+|---|---|
+| SBOM + assinatura de artefato (Syft, cosign, SLSA) | O valor é para artefato **distribuído** (pacote publicado, binário de release) — quem verifica a assinatura é o consumidor. App privado que deploya do próprio repo não tem esse consumidor. Se um dia publicar pacote/imagem, reavalie |
+| DAST (scan da app rodando) | Exige ambiente deployado por PR + minutos de scan. O smoke de preview ([doc 02](02-gate-de-ci.md)) cobre o caso barato (a app sobe?); DAST de verdade é decisão de projeto, não default |
+| Métrica de churn de código IA | O tooling que a mede em escala (GitClear) é pago; proxy via `git log` existe, mas sem baseline de mercado o número não diz nada. O sinal acionável equivalente: mutation score baixo em módulo de autoria IA ([doc 14](14-forca-de-teste.md)) |
+
 ## Regras de decisão rápidas
 
 - **Repo público** → tudo deste repo funciona free, incluindo a enforcement (branch protection).

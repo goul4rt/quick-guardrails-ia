@@ -24,7 +24,7 @@ Pela regra de admissão do [doc 09](09-custos.md) (exige serviço pago ou cobran
 - **SonarQube/SonarCloud** (quality gate "Clean as You Code") — pago para repo privado. O equivalente free parcial: gate de lint/types zerado + cobertura em código novo via script.
 - **CodeRabbit / Copilot code review / Claude Code Action como reviewer** — cobrança por token/assinatura extra. O desenho certo está registrado no [doc 08](08-seguranca-no-gate.md) camada 2 para quando houver orçamento.
 - **CodeQL** — exige GitHub Advanced Security em repo privado. Semgrep CE (CLI, free) cobre a camada SAST.
-- Entram sem ressalva (free, e a literatura converge): **pins por SHA + Dependabot** ([doc 03](03-supply-chain.md)), **gitleaks CLI** ([doc 08](08-seguranca-no-gate.md)), **AGENTS.md** como padrão neutro de contexto (symlink de `CLAUDE.md` — complemento ao [doc 01](01-contexto-do-projeto.md)), **mutation testing** (Stryker/mutmut, OSS) e **property-based testing** (fast-check/Hypothesis, OSS).
+- Entram sem ressalva (free, e a literatura converge): **pins por SHA + Dependabot** ([doc 03](03-supply-chain.md)), **gitleaks CLI** ([doc 08](08-seguranca-no-gate.md)), **AGENTS.md** como padrão neutro de contexto (symlink de `CLAUDE.md` — complemento ao [doc 01](01-contexto-do-projeto.md)), **mutation testing** e **property-based testing** (Stryker/mutmut e fast-check/Hypothesis, OSS — prática no [doc 14](14-forca-de-teste.md)).
 
 ## Como ler esses números
 
