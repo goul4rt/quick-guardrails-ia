@@ -1,10 +1,45 @@
+<div align="center">
+
 # Metodologias para desenvolvimento com IA
 
-Práticas, guardrails e artefatos prontos para desenvolver software com agentes de IA (Claude Code) de forma **segura, reprodutível e auditável** — extraídos de trabalho real em produção.
+**Guardrails que não dependem do agente obedecer** — gate de CI bloqueante, hooks determinísticos, supply chain travada e evidência obrigatória, de 0 → funcionando **sem orçamento**.
 
-**Guideline formal de 0 → funcionando sem orçamento**: regras locais (hooks, configs versionadas), ferramentas OSS e recursos públicos/gratuitos. A única base paga assumida é a assinatura do Claude Code que você já tem. Peça que exige serviço externo pago ou cobrança por token **não entra nos templates** — a regra de admissão e a tabela de custos estão no [doc 09](docs/09-custos.md).
+[![ci](https://github.com/goul4rt/metodologias-desenvolvimento-ia/actions/workflows/ci.yml/badge.svg)](https://github.com/goul4rt/metodologias-desenvolvimento-ia/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/github/license/goul4rt/metodologias-desenvolvimento-ia)](LICENSE)
+[![last commit](https://img.shields.io/github/last-commit/goul4rt/metodologias-desenvolvimento-ia)](https://github.com/goul4rt/metodologias-desenvolvimento-ia/commits/master)
 
-Tudo aqui nasceu de trabalho real em **três codebases em produção** — um app mobile (React Native), um painel web (Next.js) e um bot (Node) — onde agentes de IA passaram a operar com gate de CI bloqueante, supply chain travada, guardrails de git e fluxo de task com evidência obrigatória. Os números e as lições são reais; as referências internas foram generalizadas para o material servir de base a qualquer projeto. O estudo de caso principal está no [doc 07](docs/07-licoes-aprendidas.md).
+</div>
+
+Instrução em prompt é probabilística; hook e gate são determinísticos. Este repositório reúne práticas, guardrails e artefatos **prontos para copiar** para desenvolver software com agentes de IA (Claude Code) de forma segura, reprodutível e auditável — usando só regras locais, ferramentas OSS e recursos gratuitos. A única base paga assumida é a assinatura do Claude Code que você já tem; o que exige serviço pago ou cobrança por token **não entra nos templates** ([doc 09](docs/09-custos.md)).
+
+Tudo aqui nasceu de trabalho real em **três codebases em produção** — um app mobile (React Native), um painel web (Next.js) e um bot (Node) — onde agentes de IA passaram a operar com gate de CI bloqueante, supply chain travada, guardrails de git e fluxo de task com evidência obrigatória. Os números e as lições são reais; as referências internas foram generalizadas para servir a qualquer projeto ([doc 07](docs/07-licoes-aprendidas.md)). E o repo come o próprio dogfood: o CI daqui roda o canário dos guardrails dos templates e checa que nenhum doc cita caminho fantasma.
+
+## Comece em 60 segundos
+
+**Auditar um repo existente (com um agente):** aponte o agente para cá com o prompt da seção [Usando com um agente de IA](#usando-com-um-agente-de-ia) — ou instale a skill que impõe o fluxo certo em qualquer repo:
+
+```bash
+git clone git@github.com:goul4rt/metodologias-desenvolvimento-ia.git
+ln -s "$PWD/metodologias-desenvolvimento-ia/.claude/skills/applying-guardrails" ~/.claude/skills/applying-guardrails
+# em qualquer repo: "aplique os guardrails" / "rode o checklist"
+```
+
+**Adotar do zero:** siga os 6 passos de [Como adotar em um repositório novo](#como-adotar-em-um-repositório-novo).
+
+**Só quer um artefato:** tudo em [`templates/`](templates/) é copiável — cada arquivo aponta o doc que explica o porquê de cada decisão.
+
+## O que muda na prática
+
+Teste real (baseline documentado na criação da skill): o mesmo modelo, o mesmo pedido — *"aplique os guardrails neste repo"* — num projeto Node recém-criado.
+
+| Sem o guideline | Com a skill `applying-guardrails` |
+|---|---|
+| Implementou 15 arquivos de uma vez, sem perguntar nada | Auditou primeiro: CHECKLIST preenchido ✅/❌/n-a, com evidência (comando + resultado) por item |
+| Inventou um `CLAUDE.md` inteiro (convenções de branch, regras de STOP) para um projeto que não conhece | Propôs só o esqueleto e listou as perguntas que apenas o dono do projeto responde |
+| Commitou e mergeou direto na `main` | Não tocou em um arquivo sequer antes da aprovação |
+| Decidiu sozinho itens com custo e trade-off | Parou no gate de decisão humana: variante de push, branch protection, autorização de install |
+
+A diferença não é o modelo — é o processo imposto por guardrail: **auditar → decidir → implementar**, cada fase com artefato obrigatório.
 
 ## Princípios
 
@@ -72,9 +107,9 @@ templates/
 
 ### Usando com um agente de IA
 
-Esse fluxo está empacotado como skill em [`.claude/skills/applying-guardrails/`](.claude/skills/applying-guardrails/SKILL.md): auditar (CHECKLIST preenchido com evidência) → decisão humana (itens ⚠️/custo, variante de push, conteúdo do `CLAUDE.md`) → implementar só o aprovado, por PR. Para disparar em qualquer repo, aponte um symlink: `ln -s <este-repo>/.claude/skills/applying-guardrails ~/.claude/skills/applying-guardrails`.
+Esse fluxo está empacotado como skill em [`.claude/skills/applying-guardrails/`](.claude/skills/applying-guardrails/SKILL.md): auditar (CHECKLIST preenchido com evidência) → decisão humana (itens ⚠️/custo, variante de push, conteúdo do `CLAUDE.md`) → implementar só o aprovado, por PR. Instalação no [quickstart](#comece-em-60-segundos).
 
-Este repositório foi escrito para ser consumido por um agente. Para implantar ou melhorar guardrails num projeto, aponte o agente para cá com um prompt neste formato:
+Sem a skill, o mesmo contrato vale como prompt — aponte o agente para cá neste formato:
 
 > Use `goul4rt/metodologias-desenvolvimento-ia` como referência. Rode o `CHECKLIST.md` contra o projeto `<alvo>`: para cada item, verifique com o comando/observação indicado e marque ✅/❌. Para cada ❌, proponha a implementação a partir do template referenciado, adaptando ao stack do projeto (os docs explicam o porquê de cada decisão — siga-os, não só copie o arquivo). Itens marcados ⚠️ ou que envolvem custo ([doc 09](docs/09-custos.md)) exigem minha decisão antes de implementar. Entregue: o checklist preenchido com evidência por item + os PRs/diffs propostos, em ordem de impacto.
 
@@ -88,3 +123,7 @@ Regras para o agente que vier por aqui: **verifique, não presuma** (cada item t
 4. **Supply chain**: `.npmrc` com `save-exact`, pins exatos, `dependabot.yml` e `audit.yml` ([doc 03](docs/03-supply-chain.md)).
 5. **Branch protection**: exija o check `ci` e bloqueie push direto na branch principal — sem isso o gate não trava nada (passo manual, precisa de admin).
 6. **Fluxo**: crie um comando `/task` adaptado ao seu tracker ([doc 06](docs/06-fluxo-de-task.md)).
+
+## Licença
+
+[MIT](LICENSE) — copie, adapte e use; atribuição é bem-vinda.
