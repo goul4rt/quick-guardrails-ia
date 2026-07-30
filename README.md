@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/banner.png" alt="Metodologias para desenvolvimento com IA — instrução em prompt é probabilística; hook e gate são determinísticos" width="900">
+</p>
+
 <div align="center">
 
 # Metodologias para desenvolvimento com IA
