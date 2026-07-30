@@ -3,6 +3,10 @@ name: CI
 # Gate de PR. Roda em todo PR (qualquer destino: task->feat/fix,
 # feat/fix->master, hotfix->master, ...) e no push pra master.
 # O build.yml continua sendo o pipeline de release (roda no release created).
+#
+# pull_request, NUNCA pull_request_target: o _target roda com secrets e escrita
+# sobre código de fork — vetor de "pwn request" (doc 02). Na mesma linha: input
+# de usuário (título de PR, branch) nunca interpolado em run: — sempre via env:.
 on:
   pull_request:
   push:
@@ -58,6 +62,16 @@ jobs:
 
       - name: Testes (jest)
         run: npm test -- --ci
+
+      # Opcional (doc 14): cobertura medida nas linhas NOVAS do PR, não no repo
+      # inteiro. Exige coverageReporters json no runner. Descomente para adotar.
+      # - name: Cobertura no código novo
+      #   if: github.event_name == 'pull_request'
+      #   env:
+      #     BASE: origin/${{ github.base_ref }}
+      #   run: |
+      #     npm test -- --ci --coverage --coverageReporters=json
+      #     node scripts/diff-coverage.mjs "$BASE"
 
       # ---------- Resumo no PR ----------
       - name: Resumo do gate

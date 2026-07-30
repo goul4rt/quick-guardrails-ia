@@ -52,6 +52,13 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
   - *Verificar*: os filtros dos dois workflows são espelhos exatos
 - [ ] `(se aplica, plataforma builda preview de PR)` Smoke test do preview disparado por `check_run`, validando identidade do check (`app.id`) — [template](templates/.github/workflows/preview-smoke.yml)
   - *Verificar*: PR com preview quebrado (5xx) fica com o check de smoke vermelho
+- [ ] Workflows sem superfície de ataque: `pull_request` (não `_target`), input de usuário via `env:` (nunca interpolado em `run:`), auto-aprovação de PR por Actions desligada — [doc 02](docs/02-gate-de-ci.md)
+  - *Verificar*: `grep -rn 'pull_request_target' .github/` vazio; nenhum `${{ github.event.*.title/body/ref }}` dentro de `run:`
+- [ ] Cobertura medida **no código novo do PR**, não no repo inteiro — [template](templates/scripts/diff-coverage.mjs) / [doc 14](docs/14-forca-de-teste.md)
+  - *Verificar*: PR com função nova sem teste fica vermelho; piso nunca reduz
+- [ ] `(se aplica, módulos com lógica de autoria IA)` Mutation testing: baseline registrado + incremental no diff do PR — [doc 14](docs/14-forca-de-teste.md)
+  - *Verificar*: sabotar um branch de propósito (`>` → `>=`) → algum teste fica vermelho; score dos módulos quentes é conhecido
+- [ ] `(se aplica, lógica pura/parsers/dinheiro)` Testes de propriedade complementando os de exemplo — [doc 14](docs/14-forca-de-teste.md)
 
 ## 4. Supply chain — [doc 03](docs/03-supply-chain.md)
 
@@ -71,6 +78,7 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
   - *Verificar*: commitar um secret de teste em branch → check falha
 - [ ] Exceções só via `.gitleaksignore` com justificativa no commit — nunca desligando o job
 - [ ] Review semântico de segurança **local e dentro da assinatura** (ex.: `/security-review`) antes de PR sensível — nada de serviço por token no pipeline ([doc 09](docs/09-custos.md))
+- [ ] Review de diff de autoria IA segue o checklist específico (dependência existe? API existe? duplica abstração? erro engolido? resolve o problema pedido?) — [doc 08](docs/08-seguranca-no-gate.md)
 - [ ] Nenhum secret de produção alcançável pelo gate de PR
   - *Verificar*: workflows de PR só usam `permissions: contents: read` e nenhum secret além dos do próprio gate
 

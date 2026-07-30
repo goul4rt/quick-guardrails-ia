@@ -30,6 +30,19 @@ O valor real de IA em segurança é o que regex não pega: lógica de autorizaç
 
 **Esta camada não tem template aqui**: custa API por token a cada PR, e a regra deste repositório é não depender de serviço externo pago (ver [doc 09](09-custos.md)). O substituto free e local: rodar `/security-review` no Claude Code (que você já assina) antes de abrir o PR — mesma análise semântica, custo já coberto pela assinatura, e o resultado vai como comentário seu no PR.
 
+### O checklist do review humano para diff de autoria IA
+
+O review local (camada 2) e o review humano do PR ganham foco quando miram os defeitos que código de LLM produz **sistematicamente** — cada item abaixo tem número no [doc 13](13-evidencias-da-literatura.md):
+
+1. **Toda dependência nova existe e é o pacote pretendido?** 19,7% das amostras de código LLM citam pacote alucinado — e 43% dos nomes se repetem, prontos para pré-registro malicioso (*slopsquatting*). Confira o nome exato no registry antes do `npm install` do PR.
+2. **As APIs chamadas existem na versão pinada?** Método alucinado compila em linguagem dinâmica e explode em runtime; em TS, `any` engole a checagem.
+3. **O diff duplica abstração que já existe?** O agente reimplementa o helper que está três arquivos ao lado — é o defeito nº 1 medido em escala (duplicação +81%). Pergunta do review: "isso já existia?"
+4. **Algum erro foi engolido?** `catch` vazio, `.catch(() => {})`, `|| true` — código de LLM "resolve" o caso infeliz silenciando-o.
+5. **O diff resolve o problema pedido — ou um parecido?** Compare com o critério de aceite da task ([doc 06](06-fluxo-de-task.md)), não com a descrição do próprio PR (que o mesmo agente escreveu).
+6. **Código colado tem licença compatível?** Bloco reconhecível de projeto GPL em codebase proprietária é contaminação.
+
+Nada disso é automatizável de graça com confiança — por isso é checklist de review, não check de CI. O que **é** automatizável já está nas outras camadas (secrets, deps, drift de imports — [doc 03](03-supply-chain.md), quinta peça).
+
 ### Camada 3 — IA explicando a falha do build
 
 A ideia mais reaproveitável do artigo de origem, e a de menor risco: quando o build falha, um LLM lê o log e posta no alerta **causa raiz + fix sugerido + prevenção** junto do link do run. Roda *depois* da falha (`if: failure()`), então não tem poder de gate — se a análise for ruim, o custo é um parágrafo ruim no canal, não um merge travado.
