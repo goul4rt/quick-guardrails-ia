@@ -40,6 +40,7 @@ Regras que fazem o canário valer:
 ## Parentes do mesmo princípio
 
 - **A coluna "Verificar" do [CHECKLIST](../CHECKLIST.md)** é um canário manual: `echo '{"tool_input":...}' | hook → exit 2` é exatamente um caso must-block. O template automatiza e amplia isso.
+- **A própria auditoria precisa de canário.** Verificação cujo sucesso é "não encontrou nada" (grep vazio, contador zero) tem o mesmo defeito do gate morto: passa com o repo limpo e passa com o comando quebrado. Numa auditoria real, um grep de pinning que não casava valor entre aspas marcou o item como atendido com 30 de 36 dependências em `^`, e o erro só apareceu por acidente meses depois. O caso de controle custa dez segundos: rode o mesmo comando contra uma linha fabricada que deveria casar. Não casou, o gap é o comando. Vale para o irmão do mesmo modo de falha: item que depende de execução se confere pelo run (`gh run list`), não pela leitura do YAML.
 - **Drift de docs**: o caso 2 documentava no README um diretório de policies **que nunca existiu em commit algum**. Um check de cinco linhas, extrair caminhos citados em README/`CLAUDE.md` e falhar se algum não existir, impede contrato de contexto apontando para infra fantasma ([doc 01](01-contexto-do-projeto.md)).
 - **O `--dry-run` do `/task`** ([doc 06](06-fluxo-de-task.md)): validar o fluxo sem efeito colateral é a mesma disciplina aplicada a processo.
 

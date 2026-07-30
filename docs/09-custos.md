@@ -52,7 +52,7 @@ Peças que a literatura recomenda ([doc 13](13-evidencias-da-literatura.md)), t�
 |---|---|
 | SBOM + assinatura de artefato (Syft, cosign, SLSA) | O valor é para artefato **distribuído** (pacote publicado, binário de release), e quem verifica a assinatura é o consumidor. App privado que deploya do próprio repo não tem esse consumidor. Se um dia publicar pacote/imagem, reavalie |
 | DAST (scan da app rodando) | Exige ambiente deployado por PR + minutos de scan. O smoke de preview ([doc 02](02-gate-de-ci.md)) cobre o caso barato (a app sobe?); DAST de verdade é decisão de projeto, não default |
-| Métrica de churn de código IA | O tooling que a mede em escala (GitClear) é pago; proxy via `git log` existe, mas sem baseline de mercado o número não diz nada. O sinal acionável equivalente é mutation score baixo em módulo de autoria IA ([doc 14](14-forca-de-teste.md)) |
+| Métrica de churn de código IA | O tooling que a mede em escala (GitClear) é pago; proxy via `git log` existe, mas sem baseline de mercado o número não diz nada. O sinal acionável equivalente é mutation score baixo em módulo cujo bug seria silencioso ([doc 14](14-forca-de-teste.md)) |
 
 ## Os 2.000 minutos acabam: anatomia de um estouro real
 

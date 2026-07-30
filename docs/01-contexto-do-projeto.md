@@ -57,6 +57,10 @@ ln -s CLAUDE.md AGENTS.md   # versionado: um contrato, N agentes
 
 O `CLAUDE.md` continua sendo a fonte única; o symlink só dá o nome padrão que os outros agentes procuram. **Nunca duplique o conteúdo em dois arquivos**: contratos duplicados divergem em silêncio, e cada agente passa a operar sob regras diferentes ([doc 13](13-evidencias-da-literatura.md) tem a evidência de que arquivo de contexto ruim é pior que nenhum).
 
+### 6. Orçamento de tamanho, senão o guia vira enciclopédia
+
+As cinco seções acima só adicionam, e é assim que um `CLAUDE.md` cresce 60% numa auditoria e ninguém percebe: cada item, isolado, se justifica. O contrato precisa de um teto declarado no próprio arquivo e de uma regra de troca: **seção nova nomeia o que foi consolidado ou removido**, a mesma disciplina que o repo aplica a código. Sem isso o arquivo continua tecnicamente correto e para de ser lido, que é o modo de falha mais caro deste doc: o agente carrega tudo a cada sessão, então o custo do inchaço é pago em toda tarefa, não uma vez.
+
 ## Exceções documentadas, não escondidas
 
 Quando o trabalho precisou fugir da convenção (um PR de tooling apontando `task/*` direto para `master`, fora do fluxo padrão), a exceção foi **declarada no corpo do PR** com a justificativa e o registro explícito de que a convenção não mudou:

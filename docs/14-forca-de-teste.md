@@ -4,6 +4,12 @@ O gate do [doc 02](02-gate-de-ci.md) prova que a suíte **passa**. Este doc atac
 
 Tudo aqui é OSS, e entra pela regra de admissão do [doc 09](09-custos.md) sem ressalva.
 
+## Onde aplicar: bug silencioso, não "autoria IA"
+
+O critério óbvio, "módulos com lógica de autoria IA", não filtra nada hoje: quase todo módulo de quase todo projeto se qualifica, e a decisão volta a ser gosto. O critério que separa é outro: **módulo cujo bug seria silencioso**. Dinheiro, autenticação, hash, ordenação, parsing. São os lugares onde o teste passa, o produto responde 200 e o erro só aparece quando alguém audita. Numa auditoria real foi exatamente ali que as duas peças abaixo pagaram o custo: um teste de propriedade achou colisão no hash de uma cadeia de auditoria, e um mutante sobrevivente expôs um caractere não tratado num redirect validado, com a linha 100% coberta e nunca verificada.
+
+O inverso também importa: em CRUD, view e cola de integração, as duas peças custam mais do que devolvem.
+
 ## Peça 1, mutation testing: o teste do teste
 
 A ferramenta muta o código (troca `>` por `>=`, remove um branch, inverte um retorno) e roda a suíte: teste forte **mata** o mutante (fica vermelho); mutante sobrevivente é comportamento que ninguém verifica. É a métrica honesta de força de suíte, porque cobertura de linha não distingue executar de verificar.
@@ -12,11 +18,13 @@ Ferramentas por stack: **Stryker** (JS/TS/C#), **mutmut** (Python), **PIT** (Jav
 
 Adoção em três passos, nessa ordem, porque full run em repo grande custa horas:
 
-1. **Baseline não-bloqueante** nos módulos quentes (os de maior autoria IA primeiro): rode uma vez, registre o score. Sem baseline, threshold é chute.
+1. **Baseline não-bloqueante** nos módulos de bug silencioso: rode uma vez, registre o score. Sem baseline, threshold é chute.
 2. **Incremental no PR**: só os arquivos do diff (`--incremental` no Stryker; `--since` no mutmut). Custo típico: minutos, não horas.
 3. **Threshold bloqueante só depois do baseline.** A regra do [doc 02](02-gate-de-ci.md) vale: quando ligar o bloqueio, a dívida já foi zerada ou registrada; gate que nasce vermelho treina bypass.
 
-Sinal de decisão (da pesquisa, [doc 13](13-evidencias-da-literatura.md)): **score abaixo de ~60% em módulo de autoria IA significa parar de acelerar feature ali e investir em teste**, porque a suíte está aprovando o que não verifica.
+Sinal de decisão (da pesquisa, [doc 13](13-evidencias-da-literatura.md)): **score abaixo de ~60% num desses módulos significa parar de acelerar feature ali e investir em teste**, porque a suíte está aprovando o que não verifica.
+
+> **Gotcha de escopo**: mutation testing só vê os testes que o mutador executa. Apontá-lo para um módulo coberto apenas por testes de integração (que rodam noutra suíte, ou pedem banco e servidor) devolve 0% e parece dívida gigante, quando o problema é escopo errado. Ou traga o módulo para a suíte unitária, ou tire-o do alvo, mas não leia o zero como qualidade.
 
 ## Peça 2, property-based testing: o teste que o autor não imaginou
 

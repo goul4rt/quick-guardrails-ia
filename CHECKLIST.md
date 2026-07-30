@@ -6,12 +6,19 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
 
 **Com um agente de IA**: aponte o agente para este repositório e peça para rodar este checklist contra o projeto-alvo. As instruções estão no [README](README.md#usando-com-um-agente-de-ia).
 
+**Duas regras sobre a própria verificação**, aprendidas em auditoria real que marcou item errado:
+
+- **Verificação negativa exige caso de controle.** Item cujo sucesso é "não encontrou nada" (grep vazio, contador zero) passa igual quando o repo está limpo e quando o comando está errado. Antes de marcar ✅, rode o mesmo comando contra uma linha fabricada que *deveria* casar. Não casou? O gap é o seu comando. (É o canário do [doc 11](docs/11-teste-o-guardrail.md) aplicado à auditoria.)
+- **Item que depende de execução se verifica pelo run, não pelo YAML.** Workflow correto que não roda (cota estourada, billing suspenso, evento errado) é pior que nenhum: o repo se comporta como se estivesse protegido.
+
 ---
 
 ## 1. Contexto do agente, [doc 01](docs/01-contexto-do-projeto.md)
 
 - [ ] `CLAUDE.md` (ou equivalente) na raiz, carregado a cada sessão
   - *Verificar*: o arquivo existe e cabe no contexto sem dominar (guia, não enciclopédia)
+- [ ] **Teto de tamanho declarado** no próprio arquivo, e seção nova aponta o que saiu
+  - *Verificar*: o arquivo está abaixo do teto; o PR que adiciona seção nomeia o que consolidou ou removeu. Os subitens abaixo só adicionam, e sem orçamento o contrato incha até ninguém ler
 - [ ] Seção de postura no topo: não presuma, exponha trade-offs, pergunte na ambiguidade
 - [ ] Regras objetivas e checáveis num diff (com exemplos ✅/❌), não prosa genérica
   - *Verificar*: para cada regra, um reviewer consegue dizer objetivamente se um diff a viola
@@ -38,6 +45,7 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
 ## 3. Gate de CI, [doc 02](docs/02-gate-de-ci.md)
 
 - [ ] Workflow de gate rodando em **todo PR** + push na mainline, [template](templates/.github/workflows/ci.yml)
+  - *Verificar*: `gh run list --workflow ci.yml --limit 5` mostra runs recentes **concluídos**, não só o arquivo existindo. Gate suspenso por billing ou disparando no evento errado marca ✅ na leitura do YAML e não protege nada
 - [ ] **Todos os checks bloqueantes**, nenhum check informativo/warning-only no gate
 - [ ] Dívida zerada **antes** de ligar o bloqueio (0 errors de lint/types; suites quebradas por design em ignore explícito)
   - *Verificar*: os comandos do gate saem com exit 0 na mainline
@@ -53,20 +61,20 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
 - [ ] `(se aplica, plataforma builda preview de PR)` Smoke test do preview disparado por `check_run`, validando identidade do check (`app.id`), [template](templates/.github/workflows/preview-smoke.yml)
   - *Verificar*: PR com preview quebrado (5xx) fica com o check de smoke vermelho
 - [ ] Workflows sem superfície de ataque: `pull_request` (não `_target`), input de usuário via `env:` (nunca interpolado em `run:`), auto-aprovação de PR por Actions desligada, [doc 02](docs/02-gate-de-ci.md)
-  - *Verificar*: `grep -rn 'pull_request_target' .github/` vazio; nenhum `${{ github.event.*.title/body/ref }}` dentro de `run:`
+  - *Verificar*: `grep -rn 'pull_request_target' .github/` vazio; nenhum `${{ github.event.*.title/body/ref }}` dentro de `run:` (controle: os dois greps precisam acusar uma linha fabricada com o padrão)
 - [ ] Cobertura medida **no código novo do PR**, não no repo inteiro, [template](templates/scripts/diff-coverage.mjs) / [doc 14](docs/14-forca-de-teste.md)
   - *Verificar*: PR com função nova sem teste fica vermelho; piso nunca reduz
-- [ ] `(se aplica, módulos com lógica de autoria IA)` Mutation testing: baseline registrado + incremental no diff do PR, [doc 14](docs/14-forca-de-teste.md)
+- [ ] `(se aplica, módulo cujo bug seria silencioso: dinheiro, auth, hash, ordenação, parsing)` Mutation testing: baseline registrado + incremental no diff do PR, [doc 14](docs/14-forca-de-teste.md)
   - *Verificar*: sabotar um branch de propósito (`>` → `>=`) deixa algum teste vermelho; score dos módulos quentes é conhecido
-- [ ] `(se aplica, lógica pura/parsers/dinheiro)` Testes de propriedade complementando os de exemplo, [doc 14](docs/14-forca-de-teste.md)
+- [ ] `(se aplica, mesmo critério: bug silencioso em lógica pura, parser, hash, dinheiro)` Testes de propriedade complementando os de exemplo, [doc 14](docs/14-forca-de-teste.md)
 
 ## 4. Supply chain, [doc 03](docs/03-supply-chain.md)
 
 - [ ] Deps diretas pinadas na versão exata + `save-exact` no `.npmrc`, [template](templates/.npmrc)
-  - *Verificar*: nenhum `^`/`~` no `package.json`
+  - *Verificar*: `grep -nE '"[^"]+": "[\^~]' package.json` vazio (controle: fabrique uma linha `"x": "^1.0.0"` e confirme que o comando a acusa. Um grep que não casa valor entre aspas marca ✅ com o `package.json` inteiro solto)
 - [ ] Dependabot semanal: patch/minor agrupados, **majors excluídos**, [template](templates/.github/dependabot.yml)
 - [ ] Actions pinadas por **SHA de 40 chars** com a versão em comentário (tag é mutável), [doc 03](docs/03-supply-chain.md)
-  - *Verificar*: `grep -rE 'uses: .+@(v[0-9]|main|master)' .github/` não retorna nada
+  - *Verificar*: `grep -rE 'uses: .+@(v[0-9]|main|master)' .github/` não retorna nada (controle: fabrique um `uses: foo/bar@v1` e confirme que o comando o acusa)
 - [ ] Auditoria periódica não-bloqueante que abre/atualiza issue, [template](templates/.github/workflows/audit.yml)
 - [ ] Lockfile em sync com o manifest
   - *Verificar*: `npm ci --dry-run` passa
