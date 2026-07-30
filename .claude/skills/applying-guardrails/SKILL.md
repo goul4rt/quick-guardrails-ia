@@ -15,13 +15,15 @@ Rode o `CHECKLIST.md` da referência contra o repo-alvo, item a item, executando
 
 ## Fase 2 — Decisão humana (gate)
 
-Apresente os gaps **em ordem de impacto**, com a proposta de implementação de cada um (template de origem + adaptações). Pare e espere decisão para:
+Apresente os gaps **em ordem de impacto**, com a proposta de implementação de cada um (template de origem + adaptações). Depois conduza as decisões como **entrevista, não formulário**:
 
-- todo item ⚠️ ou que envolve custo (doc 09 da referência) — ex.: branch protection em repo privado;
-- a variante do hook de push (bloquear todo push × só forçado);
-- conteúdo que exige conhecimento do projeto: **`CLAUDE.md` se escreve com o humano** — regras, gotchas e anti-patterns vêm do projeto real; propor esqueleto é ok, inventar conteúdo não é.
+- **Fato se descobre, decisão se pergunta.** O que um comando ou arquivo responde (stack, remoto, público × privado), descubra você mesmo; só trade-off, custo e preferência vão para o humano.
+- **Uma decisão por vez**, na ordem das dependências entre elas (ex.: público × privado antes de branch protection, que depende do custo). Várias perguntas de uma vez confundem.
+- **Toda pergunta chega com a sua recomendação e o porquê** ("Recomendo bloquear só push forçado porque…"). Espere a resposta antes da próxima.
 
-Usuário indisponível ou sessão autônoma? Entregue auditoria + propostas e **pare aí**. Implementar tudo sozinho é o erro, não o zelo.
+São sempre decisões humanas: todo item ⚠️ ou com custo (doc 09 da referência); a variante do hook de push (todo push × só forçado); e conteúdo que exige conhecimento do projeto — **`CLAUDE.md` se escreve com o humano** (propor esqueleto é ok, inventar conteúdo não é).
+
+Nada de implementar até o humano confirmar que o entendimento é comum. Usuário indisponível ou sessão autônoma? Entregue auditoria + propostas com a recomendação registrada por decisão pendente e **pare aí**. Implementar tudo sozinho é o erro, não o zelo.
 
 ## Fase 3 — Implementação (só o aprovado)
 
