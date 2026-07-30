@@ -56,6 +56,8 @@ Lista checável para auditar um projeto contra este guideline — ou guiar a imp
 - [ ] Deps diretas pinadas na versão exata + `save-exact` no `.npmrc` — [template](templates/.npmrc)
   - *Verificar*: nenhum `^`/`~` no `package.json`
 - [ ] Dependabot semanal: patch/minor agrupados, **majors excluídos** — [template](templates/.github/dependabot.yml)
+- [ ] Actions pinadas por **SHA de 40 chars** com a versão em comentário (tag é mutável) — [doc 03](docs/03-supply-chain.md)
+  - *Verificar*: `grep -rE 'uses: .+@(v[0-9]|main|master)' .github/` não retorna nada
 - [ ] Auditoria periódica não-bloqueante que abre/atualiza issue — [template](templates/.github/workflows/audit.yml)
 - [ ] Lockfile em sync com o manifest
   - *Verificar*: `npm ci --dry-run` passa

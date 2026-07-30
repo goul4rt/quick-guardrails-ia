@@ -1,0 +1,35 @@
+name: ci
+
+# O gate DESTE repo — o guideline comendo o próprio dogfood:
+# 1. os guardrails dos templates são PROVADOS (canário do doc 11), não só exibidos;
+# 2. nenhum doc cita caminho fantasma (anti-drift do doc 11);
+# 3. cada checker é testado com um caso must-block antes de valer (princípio 7).
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Canário do hook de git destrutivo (must-block + must-pass)
+        run: bash templates/scripts/test-guardrails.sh templates/.claude/hooks/block-dangerous-git.sh
+
+      - name: Canário do checker de docs (must-block)
+        run: |
+          mkdir -p /tmp/doc-canary/docs
+          echo '[quebrado](nao-existe.md)' > /tmp/doc-canary/README.md
+          if bash scripts/check-doc-paths.sh /tmp/doc-canary; then
+            echo "checker não pegou link quebrado — gate morto" >&2
+            exit 1
+          fi
+
+      - name: Drift de docs (links relativos resolvem)
+        run: bash scripts/check-doc-paths.sh

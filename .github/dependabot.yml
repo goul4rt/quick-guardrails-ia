@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # Mantém os pins de SHA vivos — tanto do workflow deste repo quanto dos
+  # templates (dependabot varre uses: em qualquer .yml sob .github e templates
+  # não; por isso o bump dos templates é manual, sinalizado pelo bump daqui).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
