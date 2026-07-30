@@ -8,6 +8,10 @@
 
 **Guardrails que não dependem do agente obedecer** — gate de CI bloqueante, hooks determinísticos, supply chain travada e evidência obrigatória, de 0 → funcionando **sem orçamento**.
 
+[![ci](https://github.com/goul4rt/metodologias-desenvolvimento-ia/actions/workflows/ci.yml/badge.svg)](https://github.com/goul4rt/metodologias-desenvolvimento-ia/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/github/license/goul4rt/metodologias-desenvolvimento-ia)](LICENSE)
+[![last commit](https://img.shields.io/github/last-commit/goul4rt/metodologias-desenvolvimento-ia)](https://github.com/goul4rt/metodologias-desenvolvimento-ia/commits/master)
+
 </div>
 
 Instrução em prompt é probabilística; hook e gate são determinísticos. Este repositório reúne práticas, guardrails e artefatos **prontos para copiar** para desenvolver software com agentes de IA (Claude Code) de forma segura, reprodutível e auditável — usando só regras locais, ferramentas OSS e recursos gratuitos. A única base paga assumida é a assinatura do Claude Code que você já tem; o que exige serviço pago ou cobrança por token **não entra nos templates** ([doc 09](docs/09-custos.md)).
