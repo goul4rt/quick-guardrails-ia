@@ -72,6 +72,8 @@ templates/
 
 ### Usando com um agente de IA
 
+Esse fluxo está empacotado como skill em [`.claude/skills/applying-guardrails/`](.claude/skills/applying-guardrails/SKILL.md): auditar (CHECKLIST preenchido com evidência) → decisão humana (itens ⚠️/custo, variante de push, conteúdo do `CLAUDE.md`) → implementar só o aprovado, por PR. Para disparar em qualquer repo, aponte um symlink: `ln -s <este-repo>/.claude/skills/applying-guardrails ~/.claude/skills/applying-guardrails`.
+
 Este repositório foi escrito para ser consumido por um agente. Para implantar ou melhorar guardrails num projeto, aponte o agente para cá com um prompt neste formato:
 
 > Use `goul4rt/metodologias-desenvolvimento-ia` como referência. Rode o `CHECKLIST.md` contra o projeto `<alvo>`: para cada item, verifique com o comando/observação indicado e marque ✅/❌. Para cada ❌, proponha a implementação a partir do template referenciado, adaptando ao stack do projeto (os docs explicam o porquê de cada decisão — siga-os, não só copie o arquivo). Itens marcados ⚠️ ou que envolvem custo ([doc 09](docs/09-custos.md)) exigem minha decisão antes de implementar. Entregue: o checklist preenchido com evidência por item + os PRs/diffs propostos, em ordem de impacto.
