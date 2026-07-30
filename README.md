@@ -12,13 +12,15 @@ Tudo aqui nasceu de trabalho real em **três codebases em produção** — um ap
 
 ## Comece em 60 segundos
 
-**Auditar um repo existente (com um agente):** aponte o agente para cá com o prompt da seção [Usando com um agente de IA](#usando-com-um-agente-de-ia) — ou instale a skill que impõe o fluxo certo em qualquer repo:
+**Auditar um repo existente (com um agente):** instale a skill como plugin do Claude Code — ela impõe o fluxo certo em qualquer repo:
 
-```bash
-git clone git@github.com:goul4rt/metodologias-desenvolvimento-ia.git
-ln -s "$PWD/metodologias-desenvolvimento-ia/.claude/skills/applying-guardrails" ~/.claude/skills/applying-guardrails
+```text
+/plugin marketplace add goul4rt/metodologias-desenvolvimento-ia
+/plugin install guardrails@metodologias
 # em qualquer repo: "aplique os guardrails" / "rode o checklist"
 ```
+
+Sem plugin, o mesmo efeito via clone + symlink (`ln -s <este-repo>/.claude/skills/applying-guardrails ~/.claude/skills/`) — ou só o prompt da seção [Usando com um agente de IA](#usando-com-um-agente-de-ia).
 
 **Adotar do zero:** siga os 6 passos de [Como adotar em um repositório novo](#como-adotar-em-um-repositório-novo).
 

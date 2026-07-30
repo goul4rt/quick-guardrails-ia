@@ -1,0 +1,6 @@
+{
+  "name": "guardrails",
+  "version": "1.0.0",
+  "description": "Aplica os guardrails do guideline metodologias-desenvolvimento-ia em qualquer repo: auditar (CHECKLIST com evidência) → decisão humana → implementar só o aprovado, por PR",
+  "author": { "name": "goulart" }
+}

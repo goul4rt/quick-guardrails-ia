@@ -1,0 +1,13 @@
+{
+  "name": "metodologias",
+  "description": "Guardrails para desenvolvimento com agentes de IA — skills do guideline metodologias-desenvolvimento-ia",
+  "owner": { "name": "goulart" },
+  "plugins": [
+    {
+      "name": "guardrails",
+      "source": "./",
+      "description": "Skill applying-guardrails: audita um repo contra o CHECKLIST do guideline (auditar → decisão humana → implementar por PR)",
+      "skills": ["./.claude/skills/applying-guardrails"]
+    }
+  ]
+}
