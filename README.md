@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/banner-v2.png" alt="Guardrails para desenvolvimento com IA: instrução em prompt é probabilística, hook e gate são determinísticos" width="900">
+  <img src="docs/assets/banner-v3.png" alt="Gate de CI bloqueando merge com git push --force: o guardrail responde 'não vai assim não'" width="900">
 </p>
 
 <div align="center">
