@@ -97,6 +97,8 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
 
 - [ ] `(se aplica)` Skills externas fixadas por hash em lockfile, restauradas por script, [template](templates/scripts/skills-install.mjs)
   - *Verificar*: clone limpo + install restaura; postinstall pulado em CI e best-effort offline
+- [ ] **Set mínimo de skills e ferramentas do agente declarado no repo**: `enabledPlugins` + hook do rtk no `.claude/settings.json` versionado, [template](templates/.claude/settings.json) / [doc 05](docs/05-skills-versionadas.md)
+  - *Verificar*: `jq .enabledPlugins .claude/settings.json` lista o set; o hook passa sem o binário: `echo '{"tool_input":{"command":"git status"}}' | PATH=/usr/bin:/bin sh -c 'command -v rtk >/dev/null && rtk hook claude || exit 0'` → rc 0, sem saída
 - [ ] Skill de **roteamento por tiers** adaptada ao projeto, [template + guia](templates/.claude/skills/routing-work/)
   - *Verificar*: critérios de tier observáveis; desempate T2/T3 presente; "verde" honesto por repo
 - [ ] `(se aplica, 2+ repos)` **Dono do contrato** definido; spec-pai sempre nele; ordem contrato → provedor → consumidor
