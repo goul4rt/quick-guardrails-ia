@@ -30,7 +30,7 @@ Tudo aqui nasceu de trabalho real em **três codebases em produção**: um app m
 
 Sem plugin, o mesmo efeito via clone + symlink (`ln -s <este-repo>/.claude/skills/applying-guardrails ~/.claude/skills/`), ou só o prompt da seção [Usando com um agente de IA](#usando-com-um-agente-de-ia).
 
-**Adotar do zero:** siga os 6 passos de [Como adotar em um repositório novo](#como-adotar-em-um-repositório-novo).
+**Adotar do zero:** siga os 7 passos de [Como adotar em um repositório novo](#como-adotar-em-um-repositório-novo).
 
 **Só quer um artefato:** tudo em [`templates/`](templates/) é copiável, e cada arquivo aponta o doc que explica o porquê de cada decisão.
 
@@ -67,7 +67,7 @@ A diferença não é o modelo, é o processo imposto por guardrail: **auditar �
 | [02. Gate de CI](docs/02-gate-de-ci.md) | Gate de PR 100% bloqueante: ordem dos checks, concurrency, e a armadilha do required check com `paths-ignore` |
 | [03. Supply chain](docs/03-supply-chain.md) | Pins exatos, Dependabot, auditoria mensal, `npm audit fix` disciplinado e lockfile drift |
 | [04. Guardrails do agente](docs/04-guardrails-do-agente.md) | Hooks `PreToolUse`/`PostToolUse`: bloquear git destrutivo, auto-fix de lint, limitações conhecidas |
-| [05. Skills versionadas](docs/05-skills-versionadas.md) | `skills-lock.json`: skills de IA fixadas por hash, restauradas no `npm install` |
+| [05. Skills versionadas](docs/05-skills-versionadas.md) | O que o agente carrega é dependência: skills por hash (`skills-lock.json`), set mínimo de plugins e rtk no `settings.json`, MCP pinado por versão/digest |
 | [06. Fluxo de task](docs/06-fluxo-de-task.md) | `/task` e `/task close`: da issue do Jira ao merge com evidência e review duplo |
 | [07. Lições aprendidas](docs/07-licoes-aprendidas.md) | Estudo de caso: o que os 5 PRs ensinaram (incluindo o que não foi adotado) |
 | [08. Segurança no gate](docs/08-seguranca-no-gate.md) | Scanner determinístico bloqueia, IA recomenda: gitleaks free + review local + triagem de falha |
@@ -124,7 +124,13 @@ Regras para o agente que vier por aqui: **verifique, não presuma** (cada item t
 
 ## Como adotar em um repositório novo
 
-0. **Máquina (uma vez)**: instale o [rtk](https://github.com/rtk-ai/rtk#installation) (`brew install rtk` no macOS/Linux com Homebrew, `winget install rtk-ai.rtk` no Windows, ou o `install.sh` do repo) e rode `rtk init -g`; depois `claude plugins install mattpocock-skills` e `claude plugins install ponytail@ponytail` (o marketplace já vem declarado no `settings.json`). O que é por repo (plugins habilitados, hook do rtk) já vem no `templates/.claude/settings.json` ([doc 05](docs/05-skills-versionadas.md)).
+0. **Máquina (uma vez)**: rtk e os plugins do set mínimo ([doc 05](docs/05-skills-versionadas.md)). O que é por repo (plugins habilitados, hook do rtk) já vem no `templates/.claude/settings.json`.
+   ```bash
+   brew install rtk                          # macOS/Linux; Windows: winget install rtk-ai.rtk; outros: github.com/rtk-ai/rtk#installation
+   rtk init -g
+   claude plugins install mattpocock-skills
+   claude plugins install ponytail@ponytail  # marketplace já declarado no settings.json
+   ```
 1. **Contexto**: escreva um `CLAUDE.md` enxuto com regras objetivas ([doc 01](docs/01-contexto-do-projeto.md)).
 2. **Guardrails**: copie `templates/.claude/` e versione no repo ([doc 04](docs/04-guardrails-do-agente.md)), junto do canário que prova que eles funcionam ([doc 11](docs/11-teste-o-guardrail.md)).
 3. **Gate**: adapte `templates/.github/workflows/ci.yml` à sua stack e **zere a dívida antes de ligar o bloqueio** ([doc 02](docs/02-gate-de-ci.md)).
