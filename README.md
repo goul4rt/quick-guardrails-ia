@@ -122,9 +122,22 @@ templates/
 
 Esse fluxo está empacotado como skill em [`.claude/skills/applying-guardrails/`](.claude/skills/applying-guardrails/SKILL.md): auditar (CHECKLIST preenchido com evidência), decidir com o humano (itens ⚠️ ou com custo, variante de push, conteúdo do `CLAUDE.md`) e implementar só o aprovado, por PR. Instalação em [Por onde começar](#por-onde-começar).
 
-Sem a skill, o mesmo contrato vale como prompt:
+Sem a skill, o mesmo contrato vale como prompt. Cole no agente, trocando `<alvo>`:
 
-> Use `goul4rt/quick-guardrails-ia` como referência. Rode o `CHECKLIST.md` contra o projeto `<alvo>`: para cada item, verifique com o comando/observação indicado e marque ✅/❌. Para cada ❌, proponha a implementação a partir do template referenciado, adaptando ao stack do projeto (os docs explicam o porquê de cada decisão: siga-os, não só copie o arquivo). Itens marcados ⚠️ ou que envolvem custo ([doc 09](docs/09-custos.md)) exigem minha decisão antes de implementar. Entregue: o checklist preenchido com evidência por item + os PRs/diffs propostos, em ordem de impacto.
+```text
+Referência: github.com/goul4rt/quick-guardrails-ia (CHECKLIST.md, docs/ e templates/).
+
+Audite o projeto <alvo> contra o CHECKLIST.md:
+
+1. Para cada item, rode a verificação indicada e marque ✅, ❌ ou n/a,
+   com a evidência (comando rodado + resultado).
+2. Entregue o checklist preenchido ANTES de tocar em qualquer arquivo.
+3. Para cada ❌, proponha a implementação a partir do template citado,
+   adaptada à stack do projeto. Leia o doc do item: ele explica o porquê.
+4. Item ⚠️ ou com custo (doc 09) espera a minha decisão. Nada é
+   implementado antes dela.
+5. Ordene as propostas por impacto neste projeto, não pela ordem do checklist.
+```
 
 Quatro regras para o agente que vier por aqui:
 
