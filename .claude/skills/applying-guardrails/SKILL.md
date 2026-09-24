@@ -30,7 +30,7 @@ Depois conduza as decisões como **entrevista, não formulário**:
 - **Uma decisão por vez**, na ordem das dependências entre elas (ex.: público × privado antes de branch protection, que depende do custo). Várias perguntas de uma vez confundem.
 - **Toda pergunta chega com a sua recomendação e o porquê** ("Recomendo bloquear só push forçado porque…"). Espere a resposta antes da próxima.
 
-São sempre decisões humanas: todo item ⚠️ ou com custo (doc 09 da referência); a variante do hook de push (todo push × só forçado); o modo do Dependabot (agrupado × só-segurança, registrado na 1ª linha do `dependabot.yml`); e conteúdo que exige conhecimento do projeto, porque **`CLAUDE.md` se escreve com o humano** (propor esqueleto é ok, inventar conteúdo não é).
+São sempre decisões humanas: todo item ⚠️ ou com custo (doc 09 da referência); a variante do hook de push (todo push × só forçado); o modo do Dependabot (agrupado × só-segurança, registrado na 1ª linha do `dependabot.yml`); e conteúdo que exige conhecimento do projeto, porque **`CLAUDE.md` se escreve com o humano** (propor esqueleto é ok, inventar conteúdo não é). Aprovado o bloco 1, a implementação dele é a skill `writing-agents-md`.
 
 Nada de implementar até o humano confirmar que o entendimento é comum. Usuário indisponível ou sessão autônoma? Entregue auditoria + propostas com a recomendação registrada por decisão pendente e **pare aí**. Implementar tudo sozinho é o erro, não o zelo.
 

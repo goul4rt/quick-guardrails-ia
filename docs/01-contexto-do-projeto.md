@@ -47,19 +47,36 @@ Gotcha sem contexto vira superstição; com contexto, vira conhecimento transfer
 
 O `README.md` ganha uma seção **"Desenvolvendo com IA"** explicando à equipe: o que o `CLAUDE.md` é, quais comandos de projeto existem (`/task`), como as skills chegam na máquina de cada dev e quais plugins instalar. O contrato do agente e o onboarding do humano apontam um para o outro.
 
-### 5. `AGENTS.md`: o mesmo contrato para qualquer agente
+### 5. `AGENTS.md` é a fonte; `CLAUDE.md` importa
 
-`AGENTS.md` é o padrão neutro de arquivo de contexto (aberto pela OpenAI em 2025, hoje sob a Agentic AI Foundation da Linux Foundation; lido por Codex, Cursor, Copilot, Jules, Gemini CLI e afins). A prática free é uma linha:
+`AGENTS.md` é o padrão neutro de arquivo de contexto (aberto pela OpenAI em 2025, hoje sob a Agentic AI Foundation da Linux Foundation; lido por Codex, Cursor, Copilot, Jules, Gemini CLI e afins). O contrato mora nele, e o `CLAUDE.md` só aponta:
 
-```bash
-ln -s CLAUDE.md AGENTS.md   # versionado: um contrato, N agentes
+```markdown
+@AGENTS.md
+
+## Claude Code
+
+⟨só o que é exclusivo do Claude Code: hooks, skills, plan mode. Vazio é o caso normal.⟩
 ```
 
-O `CLAUDE.md` continua sendo a fonte única; o symlink só dá o nome padrão que os outros agentes procuram. **Nunca duplique o conteúdo em dois arquivos**: contratos duplicados divergem em silêncio, e cada agente passa a operar sob regras diferentes ([doc 13](13-evidencias-da-literatura.md) tem a evidência de que arquivo de contexto ruim é pior que nenhum).
+Por que import e não symlink: o `CLAUDE.md` ganha lugar para o que só vale no Claude Code sem sujar o contrato dos outros agentes, e import funciona igual no Windows, onde symlink versionado costuma virar arquivo de texto. O Claude Code também lê `AGENTS.md` direto quando não há `CLAUDE.md`, mas um `CLAUDE.local.md` pessoal desliga essa leitura em silêncio ([doc oficial](https://code.claude.com/docs/en/memory#agents-md)); o import não tem essa pegadinha.
+
+**Nunca duplique o conteúdo em dois arquivos**: contratos duplicados divergem em silêncio, e cada agente passa a operar sob regras diferentes ([doc 13](13-evidencias-da-literatura.md) tem a evidência de que arquivo de contexto ruim é pior que nenhum).
 
 ### 6. Orçamento de tamanho, senão o guia vira enciclopédia
 
 As cinco seções acima só adicionam, e é assim que um `CLAUDE.md` cresce 60% numa auditoria e ninguém percebe: cada item, isolado, se justifica. O contrato precisa de um teto declarado no próprio arquivo e de uma regra de troca: **seção nova nomeia o que foi consolidado ou removido**, a mesma disciplina que o repo aplica a código. Sem isso o arquivo continua tecnicamente correto e para de ser lido, que é o modo de falha mais caro deste doc: o agente carrega tudo a cada sessão, então o custo do inchaço é pago em toda tarefa, não uma vez.
+
+## O fluxo para escrever
+
+O arquivo sai de quatro fases, nesta ordem, empacotadas na skill [`writing-agents-md`](../.claude/skills/writing-agents-md/SKILL.md) (vem no plugin `guardrails`; peça "escreva o AGENTS.md deste repo"):
+
+1. **Fatos**: o agente descobre sozinho stack, comandos (rodando cada um), convenções visíveis e contexto que já exista. Separa o que parece decisão mas o código não explica.
+2. **Entrevista**: `grilling` + `domain-modeling` do [`mattpocock-skills`](https://github.com/mattpocock/skills) (o par que o `/grill-with-docs` dispara) sobre essas decisões, uma pergunta por vez. Termo resolvido vai para `CONTEXT.md`; decisão difícil de reverter, surpreendente e fruto de trade-off vira ADR em `docs/adr/`.
+3. **Escrita**: `AGENTS.md` pelas seis seções acima, abaixo de 200 linhas (o limite que a própria Anthropic recomenda), e `CLAUDE.md` com `@AGENTS.md`.
+4. **Auditoria**: `claude-md-improver` (plugin oficial `claude-md-management`) sobre o par. Em conflito com este doc, este doc vence: o improver tende a sugerir seção de arquitetura, e o teto ganha.
+
+A separação 1 × 2 é a que a skill `applying-guardrails` já usa: fato se descobre, decisão se pergunta. Um `CLAUDE.md` inventado pelo agente sem a Fase 2 é o erro nº 2 do baseline do README.
 
 ## Exceções documentadas, não escondidas
 
