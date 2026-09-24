@@ -124,7 +124,7 @@ Regras para o agente que vier por aqui: **verifique, não presuma** (cada item t
 
 ## Como adotar em um repositório novo
 
-0. **Máquina (uma vez)**: `brew install rtk && rtk init -g` e `claude plugins install mattpocock-skills`. O que é por repo (plugins habilitados, hook do rtk) já vem no `templates/.claude/settings.json` ([doc 05](docs/05-skills-versionadas.md)).
+0. **Máquina (uma vez)**: `brew install rtk && rtk init -g`, `claude plugins install mattpocock-skills` e `claude plugins install ponytail@ponytail` (o marketplace já vem declarado no `settings.json`). O que é por repo (plugins habilitados, hook do rtk) já vem no `templates/.claude/settings.json` ([doc 05](docs/05-skills-versionadas.md)).
 1. **Contexto**: escreva um `CLAUDE.md` enxuto com regras objetivas ([doc 01](docs/01-contexto-do-projeto.md)).
 2. **Guardrails**: copie `templates/.claude/` e versione no repo ([doc 04](docs/04-guardrails-do-agente.md)), junto do canário que prova que eles funcionam ([doc 11](docs/11-teste-o-guardrail.md)).
 3. **Gate**: adapte `templates/.github/workflows/ci.yml` à sua stack e **zere a dívida antes de ligar o bloqueio** ([doc 02](docs/02-gate-de-ci.md)).

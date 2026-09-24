@@ -50,7 +50,7 @@ O lock vendoriza skills avulsas. **Plugins de marketplace** (skills invocadas co
 | Item | Onde fica | Por quê |
 |---|---|---|
 | `mattpocock-skills@claude-plugins-official` | `enabledPlugins` | Skills de processo (spec, tickets, triage, grilling); marketplace oficial, não precisa de `add` |
-| `ponytail@ponytail` | `enabledPlugins` | Solução mínima primeiro; o marketplace se instala uma vez por máquina |
+| `ponytail@ponytail` | `enabledPlugins` + `extraKnownMarketplaces` | Solução mínima primeiro ([DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)). Marketplace de terceiro: declarado no mesmo arquivo, para o clone saber de onde instalar sem ninguém lembrar o `marketplace add` |
 | hook `rtk hook claude` | `hooks.PreToolUse` (Bash) | Reescreve cada comando para a versão filtrada do [rtk](https://github.com/rtk-ai/rtk): 60 a 90% menos tokens em git/test/build. Com guard (`command -v rtk || exit 0`): sem o binário, passa direto, nunca quebra a sessão |
 
 Na máquina, uma vez: `brew install rtk && rtk init -g` (o `-g` põe o hook e o `RTK.md` na config global). **Não rode `rtk init` dentro do repo**: ele injeta ~150 linhas no `CLAUDE.md`, estourando o teto do [doc 01](01-contexto-do-projeto.md), e o hook já faz a reescrita sem instrução nenhuma. Plugin habilitado no repo e ausente na máquina: o Claude Code avisa na abertura; `claude plugins install <nome>` resolve.
