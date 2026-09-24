@@ -15,8 +15,8 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
 
 ## 1. Contexto do agente, [doc 01](docs/01-contexto-do-projeto.md)
 
-- [ ] `CLAUDE.md` (ou equivalente) na raiz, carregado a cada sessão
-  - *Verificar*: o arquivo existe e cabe no contexto sem dominar (guia, não enciclopédia)
+- [ ] `AGENTS.md` na raiz como contrato, e `CLAUDE.md` com `@AGENTS.md` (sem conteúdo duplicado), escrito pelo fluxo fatos → entrevista → escrita → auditoria, [skill](.claude/skills/writing-agents-md/SKILL.md) / [doc 01](docs/01-contexto-do-projeto.md)
+  - *Verificar*: `head -1 CLAUDE.md` é `@AGENTS.md`; `wc -l AGENTS.md` abaixo de 200
 - [ ] **Teto de tamanho declarado** no próprio arquivo, e seção nova aponta o que saiu
   - *Verificar*: o arquivo está abaixo do teto; o PR que adiciona seção nomeia o que consolidou ou removeu. Os subitens abaixo só adicionam, e sem orçamento o contrato incha até ninguém ler
 - [ ] Seção de postura no topo: não presuma, exponha trade-offs, pergunte na ambiguidade

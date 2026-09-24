@@ -1,7 +1,8 @@
 {
   "enabledPlugins": {
     "ponytail@ponytail": true,
-    "mattpocock-skills@claude-plugins-official": true
+    "mattpocock-skills@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true
   },
   "hooks": {
     "PreToolUse": [

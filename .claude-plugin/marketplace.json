@@ -1,13 +1,18 @@
 {
   "name": "metodologias",
   "description": "Guardrails para desenvolvimento com agentes de IA: skills do guideline quick-guardrails-ia",
-  "owner": { "name": "goulart" },
+  "owner": {
+    "name": "goulart"
+  },
   "plugins": [
     {
       "name": "guardrails",
       "source": "./",
-      "description": "Skill applying-guardrails: audita um repo contra o CHECKLIST do guideline (auditar → decisão humana → implementar por PR)",
-      "skills": ["./.claude/skills/applying-guardrails"]
+      "description": "Skills applying-guardrails (audita um repo contra o CHECKLIST: auditar → decisão humana → implementar por PR) e writing-agents-md (AGENTS.md por fatos → entrevista → escrita → auditoria)",
+      "skills": [
+        "./.claude/skills/applying-guardrails",
+        "./.claude/skills/writing-agents-md"
+      ]
     }
   ]
 }

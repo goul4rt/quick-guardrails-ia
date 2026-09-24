@@ -22,12 +22,12 @@ O material vem de três codebases em produção (um app React Native, um painel 
 
 ### Auditar um repo que já existe
 
-Instale a skill como plugin do Claude Code. Ela impõe o fluxo certo em qualquer repo:
+Instale o plugin do Claude Code. Ele traz duas skills: `applying-guardrails` (audita o repo contra o CHECKLIST) e `writing-agents-md` (escreve o `AGENTS.md` com você):
 
 ```text
 /plugin marketplace add goul4rt/quick-guardrails-ia
 /plugin install guardrails@metodologias
-# em qualquer repo: "aplique os guardrails" / "rode o checklist"
+# em qualquer repo: "aplique os guardrails" / "escreva o AGENTS.md deste repo"
 ```
 
 Sem plugin, o mesmo efeito vem de um clone com symlink (`ln -s <este-repo>/.claude/skills/applying-guardrails ~/.claude/skills/`), ou só do prompt da seção [Usando com um agente de IA](#usando-com-um-agente-de-ia).
@@ -69,7 +69,7 @@ Mesmo modelo nos dois casos. O que mudou foi o processo que a skill impõe: audi
 
 | Doc | Conteúdo |
 |---|---|
-| [01. Contexto do projeto](docs/01-contexto-do-projeto.md) | `CLAUDE.md` como contrato operacional do agente: regras objetivas, gotchas, anti-patterns |
+| [01. Contexto do projeto](docs/01-contexto-do-projeto.md) | `AGENTS.md` como contrato do agente (e `CLAUDE.md` importando): regras objetivas, gotchas, teto de tamanho, e o fluxo para escrever |
 | [02. Gate de CI](docs/02-gate-de-ci.md) | Gate de PR 100% bloqueante: ordem dos checks, concurrency, e a armadilha do required check com `paths-ignore` |
 | [03. Supply chain](docs/03-supply-chain.md) | Pins exatos, Dependabot, auditoria mensal, `npm audit fix` disciplinado e lockfile drift |
 | [04. Guardrails do agente](docs/04-guardrails-do-agente.md) | Hooks `PreToolUse`/`PostToolUse`: bloquear git destrutivo, auto-fix de lint, limitações conhecidas |
@@ -153,9 +153,10 @@ Quatro regras para o agente que vier por aqui:
    brew install rtk                          # macOS/Linux; Windows: winget install rtk-ai.rtk; outros: github.com/rtk-ai/rtk#installation
    rtk init -g
    claude plugins install mattpocock-skills
+   claude plugins install claude-md-management
    claude plugins install ponytail@ponytail  # marketplace já declarado no settings.json
    ```
-1. Escreva um `CLAUDE.md` enxuto, com regras que dá para checar num diff ([doc 01](docs/01-contexto-do-projeto.md)).
+1. Peça ao agente "escreva o AGENTS.md deste repo": a skill `writing-agents-md` levanta os fatos, entrevista você sobre as decisões, grava ADRs e escreve o `AGENTS.md` com um `CLAUDE.md` que o importa ([doc 01](docs/01-contexto-do-projeto.md)).
 2. Copie `templates/.claude/` e versione no repo ([doc 04](docs/04-guardrails-do-agente.md)), junto do canário que prova que os hooks funcionam ([doc 11](docs/11-teste-o-guardrail.md)).
 3. Adapte `templates/.github/workflows/ci.yml` à sua stack e zere a dívida antes de ligar o bloqueio ([doc 02](docs/02-gate-de-ci.md)).
 4. Supply chain: `.npmrc` com `save-exact`, pins exatos, `dependabot.yml` e `audit.yml` ([doc 03](docs/03-supply-chain.md)).

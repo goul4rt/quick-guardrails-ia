@@ -1,6 +1,8 @@
 {
   "name": "guardrails",
-  "version": "1.1.0",
-  "description": "Aplica os guardrails do guideline quick-guardrails-ia em qualquer repo: auditar (CHECKLIST com evidência) → decisão humana → implementar só o aprovado, por PR",
-  "author": { "name": "goulart" }
+  "version": "1.2.0",
+  "description": "Aplica os guardrails do guideline quick-guardrails-ia em qualquer repo: auditar (CHECKLIST com evidência) → decisão humana → implementar só o aprovado, por PR; e escreve o AGENTS.md do repo com o humano",
+  "author": {
+    "name": "goulart"
+  }
 }
