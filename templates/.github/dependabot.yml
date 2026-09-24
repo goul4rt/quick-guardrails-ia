@@ -1,20 +1,37 @@
+# Modo: ⟨agrupado | só-segurança⟩, decidido em ⟨AAAA-MM-DD⟩: ⟨motivo em uma linha⟩
+# Os modos estão no doc 03 (peça 2); a skill applying-guardrails pergunta qual usar.
+#
+# agrupado (padrão): no máximo 1 PR de actions + 1 de npm por mês, mais os de segurança.
+# só-segurança: troque os dois `open-pull-requests-limit` por 0. Isso desliga os PRs
+#   de versão; os security updates continuam chegando, porque dependem do toggle do
+#   repo (Settings → Code security → Dependabot security updates), não deste arquivo.
 version: 2
 updates:
-  # Actions dos workflows (checkout, setup-node, ...) — PRs de major/minor + advisories.
+  # Actions dos workflows (checkout, setup-node, ...): tudo num PR só.
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    open-pull-requests-limit: 5
+    # Versão recém-publicada espera 7 dias: release maliciosa costuma ser removida
+    # antes disso. Não atrasa security update.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
 
-  # Deps do app. Só security updates + patch/minor agrupados — major de lib RN
-  # quebra build nativo e merece PR manual, não bot.
+  # Deps do app. Major fica de fora: major de lib RN quebra build nativo e merece
+  # PR manual, não bot.
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: build
     ignore:
@@ -23,3 +40,7 @@ updates:
     groups:
       minor-e-patch:
         update-types: [minor, patch]
+      # Várias advisories na mesma semana viram um PR, não um por pacote.
+      seguranca:
+        applies-to: security-updates
+        patterns: ["*"]

@@ -32,6 +32,8 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
 ## 2. Guardrails do harness, [doc 04](docs/04-guardrails-do-agente.md)
 
 - [ ] `.claude/settings.json` **versionado no repo** (guardrail de time, não config pessoal)
+- [ ] Config que o agente executa (`.claude/`, `.mcp.json`, `.husky/`, `.github/`) muda **só por PR com revisor humano**: `CODEOWNERS` cobrindo esses caminhos, [template](templates/.github/CODEOWNERS)
+  - *Verificar*: `.github/CODEOWNERS` lista os quatro caminhos e PR que toca `.claude/` pede review do dono sozinho (⚠️ exigir a aprovação é branch protection, pago em repo privado, [doc 09](docs/09-custos.md))
 - [ ] Hook `PreToolUse` bloqueando git destrutivo, [template](templates/.claude/hooks/block-dangerous-git.sh)
   - *Verificar*: `echo '{"tool_input":{"command":"git push --force"}}' | .claude/hooks/block-dangerous-git.sh` → exit 2
 - [ ] Variante de push decidida conscientemente (bloquear todo push ou só forçado) e registrada no hook
@@ -54,7 +56,7 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
   - *Verificar*: todo step multi-comando com pipe tem `set -o pipefail` (ou lê `PIPESTATUS`); nenhum `actions/cache` cobre resultado de checagem
 - [ ] Mudança em `.github/workflows/` só em PR dedicado (nunca de carona em refactor); steps que executam o gate têm comentário-sentinela
   - *Verificar*: `git log --oneline -- .github/workflows/` mostra apenas commits cujo assunto é CI/workflow
-- [ ] **Branch protection exigindo o check + bloqueio de push direto** (⚠️ pago em repo privado, [doc 09](docs/09-custos.md))
+- [ ] **Branch protection exigindo o check + bloqueio de push direto** (⚠️ pago em repo privado, [doc 09](docs/09-custos.md)). Vale **independente da config do agente**: hook local não segura agente rodando com permissões desligadas; o servidor segura
   - *Verificar*: merge com check vermelho é impossível; OU a ausência é decisão registrada ("gate informativo, disciplina social")
 - [ ] `(se aplica)` `paths-ignore` de docs acompanhado do workflow no-op espelhado, [template](templates/.github/workflows/ci-docs-noop.yml)
   - *Verificar*: os filtros dos dois workflows são espelhos exatos
@@ -72,7 +74,8 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
 
 - [ ] Deps diretas pinadas na versão exata + `save-exact` no `.npmrc`, [template](templates/.npmrc)
   - *Verificar*: `grep -nE '"[^"]+": "[\^~]' package.json` vazio (controle: fabrique uma linha `"x": "^1.0.0"` e confirme que o comando a acusa. Um grep que não casa valor entre aspas marca ✅ com o `package.json` inteiro solto)
-- [ ] Dependabot semanal: patch/minor agrupados, **majors excluídos**, [template](templates/.github/dependabot.yml)
+- [ ] Dependabot com **modo decidido e registrado** na 1ª linha do `dependabot.yml` (agrupado × só-segurança), majors excluídos, tudo agrupado, [template](templates/.github/dependabot.yml) / [doc 03](docs/03-supply-chain.md)
+  - *Verificar*: `head -1 .github/dependabot.yml` mostra modo e data; `gh api repos/{owner}/{repo}/automated-security-fixes` retorna `"enabled": true`
 - [ ] Actions pinadas por **SHA de 40 chars** com a versão em comentário (tag é mutável), [doc 03](docs/03-supply-chain.md)
   - *Verificar*: `grep -rE 'uses: .+@(v[0-9]|main|master)' .github/` não retorna nada (controle: fabrique um `uses: foo/bar@v1` e confirme que o comando o acusa)
 - [ ] Auditoria periódica não-bloqueante que abre/atualiza issue, [template](templates/.github/workflows/audit.yml)
@@ -94,12 +97,16 @@ Lista checável para auditar um projeto contra este guideline, ou guiar a implem
 
 - [ ] `(se aplica)` Skills externas fixadas por hash em lockfile, restauradas por script, [template](templates/scripts/skills-install.mjs)
   - *Verificar*: clone limpo + install restaura; postinstall pulado em CI e best-effort offline
+- [ ] **Set mínimo de skills e ferramentas do agente declarado no repo**: `enabledPlugins` + hook do rtk no `.claude/settings.json` versionado, [template](templates/.claude/settings.json) / [doc 05](docs/05-skills-versionadas.md)
+  - *Verificar*: `jq .enabledPlugins .claude/settings.json` lista o set; o hook passa sem o binário: `echo '{"tool_input":{"command":"git status"}}' | PATH=/usr/bin:/bin sh -c 'command -v rtk >/dev/null && rtk hook claude || exit 0'` → rc 0, sem saída
 - [ ] Skill de **roteamento por tiers** adaptada ao projeto, [template + guia](templates/.claude/skills/routing-work/)
   - *Verificar*: critérios de tier observáveis; desempate T2/T3 presente; "verde" honesto por repo
 - [ ] `(se aplica, 2+ repos)` **Dono do contrato** definido; spec-pai sempre nele; ordem contrato → provedor → consumidor
 - [ ] `(se aplica)` Fluxo de task com **evidência por critério de aceite** e veredito honesto (PASSOU/FALHOU), [doc 06](docs/06-fluxo-de-task.md)
 - [ ] `(se aplica, tracker externo)` MCP do tracker **versionado no repo** (`.mcp.json`), servidor em Docker, credenciais lidas do `.env` no launch, [template](templates/.mcp.json)
   - *Verificar*: nenhum segredo no `.mcp.json` commitado; clone limpo + `.env` preenchido = tracker plugado
+- [ ] `(se aplica)` Servidores MCP **pinados** como qualquer dependência: pacote npm em versão exata, imagem Docker por digest `sha256`, nunca `@latest`/`:latest`; servidor novo entra pelo `.mcp.json` versionado, não pela config pessoal, [doc 05](docs/05-skills-versionadas.md)
+  - *Verificar*: `grep -nE '@latest|:latest' .mcp.json` vazio (controle: fabrique um `"x@latest"` e confirme que o grep o acusa)
 - [ ] `(se aplica, tracker com sub-issues)` Cascata de fechamento automatizada, [template](templates/.github/workflows/close-sub-issues.yml)
 
 ## 7. Meta, [docs 07](docs/07-licoes-aprendidas.md), [09](docs/09-custos.md)

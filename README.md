@@ -89,7 +89,8 @@ templates/
 │   ├── workflows/security.yml      # gitleaks CLI (free, bloqueante): secrets no histórico
 │   ├── workflows/preview-smoke.yml # valida que o preview de deploy responde (via check_run)
 │   ├── workflows/close-sub-issues.yml # cascata: pai fechada → fecha sub-issues (cross-repo)
-│   └── dependabot.yml              # semanal, majors excluídos, minor+patch agrupados
+│   ├── dependabot.yml              # mensal, agrupado, majors excluídos; modo registrado no arquivo
+│   └── CODEOWNERS                  # config que o agente executa só muda com revisor humano
 ├── .claude/
 │   ├── settings.json               # hooks + plugins versionados (guardrails de time)
 │   ├── hooks/
@@ -98,7 +99,7 @@ templates/
 │   └── skills/routing-work/        # skill de roteamento por tiers (copiável; ver ADAPTING.md)
 ├── .husky/
 │   └── pre-commit                  # disciplina de branch no git, vale p/ humano e agente
-├── .mcp.json                       # tracker plugado no agente: MCP do Jira em Docker, creds via .env
+├── .mcp.json                       # MCPs pinados (versão exata / digest); Jira em Docker, creds via .env
 ├── scripts/
 │   ├── skills-install.mjs          # restaura skills do lock (postinstall seguro)
 │   ├── jira-attach.sh              # anexa evidência a issue do Jira via REST
@@ -123,6 +124,7 @@ Regras para o agente que vier por aqui: **verifique, não presuma** (cada item t
 
 ## Como adotar em um repositório novo
 
+0. **Máquina (uma vez)**: instale o [rtk](https://github.com/rtk-ai/rtk#installation) (`brew install rtk` no macOS/Linux com Homebrew, `winget install rtk-ai.rtk` no Windows, ou o `install.sh` do repo) e rode `rtk init -g`; depois `claude plugins install mattpocock-skills` e `claude plugins install ponytail@ponytail` (o marketplace já vem declarado no `settings.json`). O que é por repo (plugins habilitados, hook do rtk) já vem no `templates/.claude/settings.json` ([doc 05](docs/05-skills-versionadas.md)).
 1. **Contexto**: escreva um `CLAUDE.md` enxuto com regras objetivas ([doc 01](docs/01-contexto-do-projeto.md)).
 2. **Guardrails**: copie `templates/.claude/` e versione no repo ([doc 04](docs/04-guardrails-do-agente.md)), junto do canário que prova que eles funcionam ([doc 11](docs/11-teste-o-guardrail.md)).
 3. **Gate**: adapte `templates/.github/workflows/ci.yml` à sua stack e **zere a dívida antes de ligar o bloqueio** ([doc 02](docs/02-gate-de-ci.md)).

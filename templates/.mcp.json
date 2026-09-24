@@ -4,12 +4,12 @@
       "command": "bash",
       "args": [
         "-c",
-        "export JIRA_API_TOKEN=\"$(grep -E '^TOKEN_FOR_JIRA=' \"$CLAUDE_PROJECT_DIR/.env\" | cut -d= -f2-)\"; export JIRA_USERNAME=\"$(grep -E '^JIRA_USERNAME=' \"$CLAUDE_PROJECT_DIR/.env\" | cut -d= -f2-)\"; export JIRA_URL=\"https://SUA-INSTANCIA.atlassian.net\"; exec docker run -i --rm --name \"mcp-atlassian-$$\" -e JIRA_URL -e JIRA_USERNAME -e JIRA_API_TOKEN ghcr.io/sooperset/mcp-atlassian:latest"
+        "export JIRA_API_TOKEN=\"$(grep -E '^TOKEN_FOR_JIRA=' \"$CLAUDE_PROJECT_DIR/.env\" | cut -d= -f2-)\"; export JIRA_USERNAME=\"$(grep -E '^JIRA_USERNAME=' \"$CLAUDE_PROJECT_DIR/.env\" | cut -d= -f2-)\"; export JIRA_URL=\"https://SUA-INSTANCIA.atlassian.net\"; exec docker run -i --rm --name \"mcp-atlassian-$$\" -e JIRA_URL -e JIRA_USERNAME -e JIRA_API_TOKEN ghcr.io/sooperset/mcp-atlassian@sha256:5b7c9b64d4eb3210cab74be8bf3e6aeea9ed14f3042dc59ba5c5287bd4dbe466"
       ]
     },
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest"]
+      "args": ["@playwright/mcp@0.0.82"]
     }
   }
 }

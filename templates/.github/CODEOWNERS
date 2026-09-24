@@ -1,0 +1,9 @@
+# Tudo que o agente executa ou que define o gate só muda com review de quem
+# mantém o repo. Hook local não segura agente com permissões desligadas; isto
+# segura. Exigir a aprovação (branch protection "require review from code
+# owners") é pago em repo privado (doc 09); em público, o request de review
+# automático já vale.
+/.claude/    @⟨owner⟩
+/.mcp.json   @⟨owner⟩
+/.husky/     @⟨owner⟩
+/.github/    @⟨owner⟩
