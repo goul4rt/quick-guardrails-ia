@@ -41,7 +41,7 @@ O restore roda automático no `npm install` (`postinstall` → `--if-missing`), 
 
 ## Dois mecanismos convivendo
 
-O lock vendoriza skills avulsas. **Plugins de marketplace** (skills invocadas com prefixo, ex.: `superpowers:brainstorming`) são outro mecanismo: declarados em `.claude/settings.json` (`enabledPlugins`), mas cada dev instala o marketplace uma vez na máquina. O `README` do projeto documenta os dois e quando cada um se aplica: o comando `/task` do projeto depende dos plugins; a reprodutibilidade bit-a-bit vem do lock.
+O lock vendoriza skills avulsas. **Plugins de marketplace** (skills invocadas com prefixo, ex.: `mattpocock-skills:grilling`) são outro mecanismo: declarados em `.claude/settings.json` (`enabledPlugins`), mas cada dev instala o marketplace uma vez na máquina. O `README` do projeto documenta os dois e quando cada um se aplica: o comando `/task` do projeto depende dos plugins; a reprodutibilidade bit-a-bit vem do lock.
 
 ### O set mínimo, declarado no repo
 

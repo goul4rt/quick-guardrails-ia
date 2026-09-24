@@ -21,7 +21,7 @@ Este repositório é um guideline formal de **0 a funcionando sem orçamento**: 
 | ESLint, Prettier, tsc, Jest, commitlint | OSS |
 | `npm audit` + Dependabot | Nativos do npm/GitHub, qualquer plano |
 | **gitleaks CLI** | MIT, sem cadastro; é o que o [`security.yml`](../templates/.github/workflows/security.yml) usa |
-| Plugins `superpowers`, `ponytail`; CLI `skills` | OSS |
+| Plugins `mattpocock-skills`, `ponytail`; CLI `skills` | OSS |
 | Claude Code (assinatura que você já tem) | `/task`, `/security-review`, hooks, skills, sem custo adicional por uso |
 
 ### 🟡 Free com condição (a pegadinha: decida pelo SEU cenário)

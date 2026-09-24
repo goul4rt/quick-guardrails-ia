@@ -7,10 +7,10 @@ Este arquivo NÃO é carregado pelo agente: é o guia de quem copia o template. 
 | Placeholder | Troque por | Exemplo (instância de origem: bot + painel web) |
 |---|---|---|
 | `⟨seus repos⟩` (na description) | Os nomes reais dos repos cobertos; é o que faz a skill disparar sozinha | "the Acme repos (acme-bot or acme-web / front-end)" |
-| `⟨skill de debugging sistemático⟩` | A skill do seu pack, ou instrução inline se não tiver pack | `superpowers:systematic-debugging` (default); `diagnosing-bugs` se cabeludo |
-| `⟨brainstorm curto⟩` / `⟨stress-test da decisão⟩` | Suas skills de alinhamento e de questionamento adversarial | `brainstorming` → `grilling` (`grill-with-docs` se render ADR) |
+| `⟨skill de debugging sistemático⟩` | A skill do seu pack, ou instrução inline se não tiver pack | `mattpocock-skills:diagnosing-bugs`; instrução inline se for trivial |
+| `⟨brainstorm curto⟩` / `⟨stress-test da decisão⟩` | Suas skills de alinhamento e de questionamento adversarial | inline ("3 abordagens + trade-offs") → `mattpocock-skills:grilling` |
 | `⟨sua skill de review⟩` / `⟨review⟩` | UM reviewer canônico, o mesmo nome em todas as menções | `code-review` (eixos Standards+Spec) |
-| `⟨proibições do seu contexto⟩` | O que o SEU fluxo proíbe, com o porquê | "Nunca `using-git-worktrees`: múltiplas instâncias no mesmo checkout; isolamento vem da partição por tickets" |
+| `⟨proibições do seu contexto⟩` | O que o SEU fluxo proíbe, com o porquê | "Nunca worktrees paralelos: múltiplas instâncias no mesmo checkout; isolamento vem da partição por tickets" |
 | `⟨repo A/B⟩` + `⟨comandos do gate⟩` | O comando de "verde" real de cada repo, honesto | bot: `npm run lint` + `lang:check` + testes escopados vs master (~20 falhas pré-existentes); front: `tsc --noEmit` + `test:run` + `next build` |
 
 ## Regras de adaptação (a parte que importa)
