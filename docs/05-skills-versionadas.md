@@ -43,6 +43,10 @@ O restore roda automático no `npm install` (`postinstall` → `--if-missing`), 
 
 O lock vendoriza skills avulsas. **Plugins de marketplace** (skills invocadas com prefixo, ex.: `superpowers:brainstorming`) são outro mecanismo: declarados em `.claude/settings.json` (`enabledPlugins`), mas cada dev instala o marketplace uma vez na máquina. O `README` do projeto documenta os dois e quando cada um se aplica: o comando `/task` do projeto depende dos plugins; a reprodutibilidade bit-a-bit vem do lock.
 
+## MCP também é dependência
+
+Servidor MCP é código que o agente executa com as suas credenciais, e a regra de supply chain do [doc 03](03-supply-chain.md) vale igual: `npx @playwright/mcp@latest` e `docker run ...:latest` puxam versão nova a cada sessão, sem PR nenhum (é o AST07, *update drift*, do OWASP Agentic Skills Top 10). O [`.mcp.json`](../templates/.mcp.json) template vem pinado: pacote npm em versão exata, imagem Docker por digest (`docker image inspect --format '{{index .RepoDigests 0}}' <imagem>` mostra o digest da que você já roda). Dependabot não lê `.mcp.json`; o bump é manual e entra como PR, com o diff do digest visível.
+
 ## Critérios de aceitação que valem reusar
 
 Do PR de origem, e note que são todos **verificáveis por comando**:

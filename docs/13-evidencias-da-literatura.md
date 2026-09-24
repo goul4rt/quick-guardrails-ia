@@ -1,6 +1,6 @@
 # 13. Evidências da literatura (2023 a 2026)
 
-Os docs deste repo nasceram de prática. Este doc registra os **números públicos** que sustentam cada escolha, para citar em decisão, PR ou discussão de orçamento, sem precisar refazer a pesquisa. Compilado em jul/2026.
+Os docs deste repo nasceram de prática. Este doc registra os **números públicos** que sustentam cada escolha, para citar em decisão, PR ou discussão de orçamento, sem precisar refazer a pesquisa. Compilado em jul/2026; OWASP e Gartner adicionados em set/2026.
 
 ## Os números, e o que cada um sustenta aqui
 
@@ -15,6 +15,9 @@ Os docs deste repo nasceram de prática. Este doc registra os **números públic
 | Anthropic, *When AI builds itself* (jun/2026) | 80%+ do código mergeado é de autoria do Claude; reviewer automático teria pego ~1/3 dos bugs de incidentes passados | Alta autoria de IA é viável **com** review obrigatório em camadas ([doc 08](08-seguranca-no-gate.md), camada 2) |
 | Gloaguen et al. 2026 (138 repos) | Arquivo de contexto **gerado por LLM** reduz taxa de sucesso do agente e custa +20% de inferência | `CLAUDE.md` curado à mão, guia e não enciclopédia ([doc 01](01-contexto-do-projeto.md)) |
 | Tanaka et al. 2025 (arXiv 2510.25297) | Testes por propriedade e baseados em exemplo: 68,75% de bugs cada, **81,25% combinados** | Diversidade de verificação ganha de mais do mesmo teste; contra o ciclo de auto-engano (teste de IA herda o ponto cego do código de IA) |
+| OWASP, *Agentic Skills Top 10* 2026 (AST10, CC BY-SA 4.0) | Skill maliciosa (AST01) e comprometimento de registro (AST02) são os dois riscos **críticos**; *update drift* (AST07) tem como mitigação-chave pinning imutável e verificação de hash | Skills fixadas por hash e MCP pinado por versão/digest ([doc 05](05-skills-versionadas.md)) |
+| OWASP, *State of Agentic AI Security and Governance* v2.01 (2026) | ASI02/ASI04/ASI05 (uso indevido de ferramenta, supply chain agêntica, execução de código inesperada): agente de código se contém no **servidor** (branch protection, CODEOWNERS), não só na própria config | Bloco 3 do CHECKLIST: guardrail local + servidor; `CODEOWNERS` sobre a config que o agente executa |
+| Gartner, G00847850 *Redesign Governance and Risk Management for AI-Native Software Engineering* (abr/2026) | Guardrails embutidos na plataforma e gates de CI/CD estendidos aos artefatos gerados por agente, não camada de governança à parte | O método inteiro ([doc 02](02-gate-de-ci.md), [doc 04](04-guardrails-do-agente.md)): guardrail no harness e no gate, não no prompt |
 | Mutation testing (relatos de praticantes) | Suites geradas por IA matam 40 a 50% dos mutantes, contra 70 a 85% das humanas | Cobertura de linha não mede força de assert; mutation score é a métrica honesta para módulo de autoria IA |
 
 ## O que a literatura recomenda e ficou FORA dos templates

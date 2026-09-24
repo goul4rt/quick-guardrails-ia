@@ -89,7 +89,8 @@ templates/
 │   ├── workflows/security.yml      # gitleaks CLI (free, bloqueante): secrets no histórico
 │   ├── workflows/preview-smoke.yml # valida que o preview de deploy responde (via check_run)
 │   ├── workflows/close-sub-issues.yml # cascata: pai fechada → fecha sub-issues (cross-repo)
-│   └── dependabot.yml              # semanal, majors excluídos, minor+patch agrupados
+│   ├── dependabot.yml              # mensal, agrupado, majors excluídos; modo registrado no arquivo
+│   └── CODEOWNERS                  # config que o agente executa só muda com revisor humano
 ├── .claude/
 │   ├── settings.json               # hooks + plugins versionados (guardrails de time)
 │   ├── hooks/
@@ -98,7 +99,7 @@ templates/
 │   └── skills/routing-work/        # skill de roteamento por tiers (copiável; ver ADAPTING.md)
 ├── .husky/
 │   └── pre-commit                  # disciplina de branch no git, vale p/ humano e agente
-├── .mcp.json                       # tracker plugado no agente: MCP do Jira em Docker, creds via .env
+├── .mcp.json                       # MCPs pinados (versão exata / digest); Jira em Docker, creds via .env
 ├── scripts/
 │   ├── skills-install.mjs          # restaura skills do lock (postinstall seguro)
 │   ├── jira-attach.sh              # anexa evidência a issue do Jira via REST

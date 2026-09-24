@@ -14,13 +14,24 @@ Resultado: `^`/`~` deixam de existir. Um `npm install` de rotina nunca puxa vers
 
 O mesmo princípio vale para **GitHub Actions**: `uses: actions/checkout@v7` é pin de *tag*, e tag é mutável (quem controla o repo da action pode reapontá-la; foi o vetor do ataque ao `tj-actions/changed-files` em 2025). A única referência imutável é o **SHA de 40 chars**, com a versão em comentário para leitura humana (`uses: actions/checkout@3d3c42e5... # v7`). Os templates deste repo vêm pinados assim; o ecossistema `github-actions` do Dependabot (peça 2) propõe os bumps mantendo o formato.
 
-### 2. Dependabot com majors excluídos
+### 2. Dependabot com majors excluídos, em modo escolhido
 
-Semanal, com duas decisões deliberadas ([template](../templates/.github/dependabot.yml)):
+Bot que abre PR toda semana vira ruído, e ruído vira PR fechado sem ler. Por isso o [template](../templates/.github/dependabot.yml) é **mensal e agrupado**, e o nível de ruído é uma decisão do dono do repo, registrada na primeira linha do próprio `dependabot.yml` (modo, data, motivo):
 
-- **Patch/minor agrupados** num PR só (`groups`), o que reduz ruído de review.
+| Modo | PRs que chegam | Quando |
+|---|---|---|
+| **agrupado** (padrão) | 1 de actions + 1 de npm por mês, mais os de segurança | Repo com gate de CI confiável: o PR mensal passa ou falha sozinho |
+| **só-segurança** | Só security updates (`open-pull-requests-limit: 0` desliga os de versão) | Repo pouco mexido, ou time sem banda para bump de rotina. Versão velha vira dívida consciente, não esquecida |
+
+Sem Dependabot nenhum não entra na tabela: aí ninguém vê CVE em dep transitiva até o audit mensal (peça 3).
+
+O que vale nos dois modos:
+
 - **Majors excluídos** (`ignore: version-update:semver-major`): major de lib nativa (React Native etc.) quebra build e merece PR humano com teste de verdade, não bot.
+- **Tudo agrupado**: patch/minor num PR, actions num PR e as advisories da semana num PR (`applies-to: security-updates`).
+- **`cooldown` de 7 dias**: versão recém-publicada espera uma semana antes de virar PR. Release maliciosa costuma ser removida nesse prazo, e o cooldown não atrasa security update.
 - Actions dos workflows também cobertas (ecosystem `github-actions`).
+- Security updates dependem do toggle do repo (Settings → Code security → Dependabot security updates), não do arquivo. Confira que está ligado.
 
 ### 3. Auditoria mensal não-bloqueante
 
